@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title>Detalle de Incidencia</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-9">
+                <!-- Barra superior de navegación y estado -->
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <a th:href="@{/incidencias}" class="btn btn-outline-secondary btn-sm">
+                        <i class="bi bi-arrow-left me-1"></i> Volver al listado
+                    </a>
+                    <div class="d-flex gap-2">
+                        <a th:href="@{'/incidencias/editar/' + ${incidencia.id}}" class="btn btn-warning btn-sm">
+                            <i class="bi bi-pencil me-1"></i> Editar
+                        </a>
+                        <a sec:authorize="hasRole('ADMIN')" 
+                           th:href="@{'/incidencias/eliminar/' + ${incidencia.id}}" 
+                           class="btn btn-danger btn-sm"
+                           onclick="return confirm('¿Seguro que deseas eliminar esta incidencia?');">
+                            <i class="bi bi-trash me-1"></i> Eliminar
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Tarjeta Principal de Información -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-secondary me-2" th:text="${incidencia.tipo.etiqueta}">Tipo</span>
+                            <span class="badge" th:classappend="'bg-' + ${incidencia.prioridad.colorBadge}" th:text="'Prioridad: ' + ${incidencia.prioridad.etiqueta}">Prioridad</span>
+                        </div>
+                        <span class="badge fs-6" th:classappend="'bg-' + ${incidencia.estado.colorBadge}" th:text="${incidencia.estado.etiqueta}">Estado</span>
+                    </div>
+                    <div class="card-body p-4">
+                        <h3 class="fw-bold text-dark mb-3" th:text="${incidencia.titulo}">Título del Incidente</h3>
+                        
+                        <div class="bg-light p-3 rounded mb-4">
+                            <h6 class="fw-bold text-muted text-uppercase small mb-2">Descripción del Suceso</h6>
+                            <p class="mb-0 text-dark" style="white-space: pre-line;" th:text="${incidencia.descripcion ?: 'Sin descripción detallada.'}"></p>
+                        </div>
+
+                        <!-- Datos Clave en Grid -->
+                        <div class="row g-3">
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <span class="text-muted small text-uppercase fw-semibold d-block">Fecha y Hora</span>
+                                    <strong class="text-dark fs-5" th:text="${incidencia.fecha}">2026-11-16</strong>
+                                    <span class="text-muted d-block small" th:text="'Hora: ' + ${incidencia.hora ?: 'No especificada'}">14:00</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <span class="text-muted small text-uppercase fw-semibold d-block">Ubicación</span>
+                                    <strong class="text-dark fs-5" th:text="${incidencia.ubicacion}">Ubicación</strong>
+                                    <span class="text-muted d-block small">Sector asignado</span>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4">
+                                <div class="border rounded p-3 h-100">
+                                    <span class="text-muted small text-uppercase fw-semibold d-block">Cámara Asociada</span>
+                                    <strong class="text-dark fs-5" th:if="${incidencia.camara != null}" th:text="${incidencia.camara.codigo}">CAM-01</strong>
+                                    <strong class="text-muted fs-5" th:if="${incidencia.camara == null}">Ninguna</strong>
+                                    <span class="text-muted d-block small" th:if="${incidencia.camara != null}" th:text="${incidencia.camara.ubicacion}">Zona</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Footer con Metadatos de Auditoría -->
+                    <div class="card-footer bg-light text-muted small py-3 px-4 d-flex justify-content-between flex-wrap gap-2">
+                        <div>
+                            <i class="bi bi-person-badge me-1"></i>
+                            Registrado por: <strong th:text="${incidencia.operador != null ? incidencia.operador.nombreCompleto : 'Sistema'}">Admin</strong>
+                        </div>
+                        <div>
+                            <i class="bi bi-clock me-1"></i>
+                            Registro: <span th:text="${#temporals.format(incidencia.fechaRegistro, 'dd/MM/yyyy HH:mm')}">16/11/2026</span>
+                            <span th:if="${incidencia.fechaActualizacion != null}">
+                                &bull; Actualizado: <span th:text="${#temporals.format(incidencia.fechaActualizacion, 'dd/MM/yyyy HH:mm')}">16/11/2026</span>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Panel de Cambio Rápido de Estado -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-4">
+                        <h5 class="fw-bold mb-3">Actualizar Estado de la Incidencia</h5>
+                        <form th:action="@{'/incidencias/' + ${incidencia.id} + '/cambiar-estado'}" method="post" class="d-flex flex-wrap gap-2 align-items-center">
+                            <select name="estado" class="form-select w-auto">
+                                <option th:each="est : ${estados}" 
+                                        th:value="${est}" 
+                                        th:text="${est.etiqueta}" 
+                                        th:selected="${est == incidencia.estado}"></option>
+                            </select>
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="bi bi-arrow-repeat me-1"></i> Cambiar Estado
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

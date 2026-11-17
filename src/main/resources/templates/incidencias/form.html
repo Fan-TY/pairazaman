@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title th:text="${tituloVista}">Formulario de Incidencia</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8">
+                <!-- Tarjeta del Formulario -->
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom">
+                        <div class="d-flex align-items-center justify-content-between">
+                            <h4 class="fw-bold mb-0 text-dark">
+                                <i class="bi bi-pencil-square text-primary me-2"></i>
+                                <span th:text="${tituloVista}">Registrar Incidencia</span>
+                            </h4>
+                            <a th:href="@{/incidencias}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-left me-1"></i> Regresar
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{${actionUrl}}" th:object="${incidenciaDto}" method="post" class="needs-validation">
+                            <input type="hidden" th:field="*{id}">
+
+                            <!-- Título -->
+                            <div class="mb-3">
+                                <label for="titulo" class="form-label fw-semibold">Título del Incidente <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control" id="titulo" th:field="*{titulo}" 
+                                       placeholder="Ej: Acceso no autorizado o fallo eléctrico" required maxlength="150">
+                                <div class="form-text">Describe brevemente lo ocurrido.</div>
+                            </div>
+
+                            <!-- Fila: Tipo y Prioridad -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label for="tipo" class="form-label fw-semibold">Tipo de Incidencia <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="prioridad" class="form-label fw-semibold">Nivel de Prioridad <span class="text-danger">*</span></label>
+                                    <select class="form-select" id="prioridad" th:field="*{prioridad}" required>
+                                        <option th:each="p : ${prioridades}" th:value="${p}" th:text="${p.etiqueta}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Fila: Fecha y Hora -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label for="fecha" class="form-label fw-semibold">Fecha del Evento <span class="text-danger">*</span></label>
+                                    <input type="date" class="form-control" id="fecha" th:field="*{fecha}" required>
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="hora" class="form-label fw-semibold">Hora Estimada (HH:mm)</label>
+                                    <input type="time" class="form-control" id="hora" th:field="*{hora}">
+                                </div>
+                            </div>
+
+                            <!-- Fila: Ubicación y Cámara -->
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-6">
+                                    <label for="ubicacion" class="form-label fw-semibold">Ubicación Física <span class="text-danger">*</span></label>
+                                    <input type="text" class="form-control" id="ubicacion" th:field="*{ubicacion}" 
+                                           placeholder="Ej: Pasillo 2, Estacionamiento B" required maxlength="200">
+                                </div>
+                                <div class="col-12 col-md-6">
+                                    <label for="camaraId" class="form-label fw-semibold">Cámara Asociada (Opcional)</label>
+                                    <select class="form-select" id="camaraId" th:field="*{camaraId}">
+                                        <option value="">-- Sin cámara vinculada --</option>
+                                        <option th:each="cam : ${camaras}" th:value="${cam.id}" 
+                                                th:text="${cam.codigo + ' - ' + cam.ubicacion}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Estado (Si es edición) -->
+                            <div class="mb-3" th:if="${incidenciaDto.id != null}">
+                                <label for="estado" class="form-label fw-semibold">Estado de la Incidencia</label>
+                                <select class="form-select" id="estado" th:field="*{estado}">
+                                    <option th:each="e : ${estados}" th:value="${e}" th:text="${e.etiqueta}"></option>
+                                </select>
+                            </div>
+
+                            <!-- Descripción -->
+                            <div class="mb-4">
+                                <label for="descripcion" class="form-label fw-semibold">Descripción Detallada</label>
+                                <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="4" 
+                                          placeholder="Añade detalles, acciones tomadas o involucrados..."></textarea>
+                            </div>
+
+                            <!-- Botones -->
+                            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                                <a th:href="@{/incidencias}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-save me-1"></i> Guardar Incidencia
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

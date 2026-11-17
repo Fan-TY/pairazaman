@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesión - Pairazamán Security</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body class="bg-light d-flex align-items-center justify-content-center min-vh-100 py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-12 col-sm-8 col-md-6 col-lg-5 col-xl-4">
+                <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
+                    <div class="card-header bg-dark text-white text-center py-4 border-0">
+                        <i class="bi bi-shield-lock-fill text-primary display-4 d-block mb-2"></i>
+                        <h4 class="fw-bold mb-0">PAIRAZAMÁN</h4>
+                        <small class="text-white-50">Control de Seguridad &amp; Monitoreo</small>
+                    </div>
+
+                    <div class="card-body p-4 p-sm-5">
+                        <h5 class="text-center fw-bold mb-4 text-dark">Inicio de Sesión</h5>
+
+                        <!-- Mensaje de error -->
+                        <div th:if="${mensajeError}" class="alert alert-danger py-2 small" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            <span th:text="${mensajeError}">Credenciales inválidas.</span>
+                        </div>
+
+                        <!-- Mensaje de éxito / logout -->
+                        <div th:if="${mensajeExito}" class="alert alert-success py-2 small" role="alert">
+                            <i class="bi bi-check-circle-fill me-1"></i>
+                            <span th:text="${mensajeExito}">Sesión cerrada.</span>
+                        </div>
+
+                        <form th:action="@{/login}" method="post">
+                            <div class="mb-3">
+                                <label for="username" class="form-label fw-semibold small">Usuario</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-person"></i></span>
+                                    <input type="text" class="form-control" id="username" name="username" 
+                                           placeholder="Ej: admin u operador" required autofocus>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="password" class="form-label fw-semibold small">Contraseña</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light"><i class="bi bi-lock"></i></span>
+                                    <input type="password" class="form-control" id="password" name="password" 
+                                           placeholder="••••••••" required>
+                                </div>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold shadow-sm mb-3">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Entrar al Sistema
+                            </button>
+                        </form>
+
+                        <div class="text-center border-top pt-3">
+                            <p class="small text-muted mb-1">¿No tienes cuenta?</p>
+                            <a th:href="@{/registro}" class="text-decoration-none fw-semibold">Crear una cuenta nueva</a>
+                        </div>
+                    </div>
+
+                    <div class="card-footer bg-light text-center py-3 border-0 small text-muted">
+                        <strong>Cuentas demo:</strong> admin / admin123 &bull; operador / operador123
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
