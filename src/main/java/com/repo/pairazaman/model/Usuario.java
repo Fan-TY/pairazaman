@@ -36,6 +36,11 @@ public class Usuario {
     @Column(nullable = false)
     private LocalDateTime fechaRegistro;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "tecnico_id")
+    private Tecnico tecnico;
+
+
     public Usuario() {
     }
 
@@ -119,4 +124,13 @@ public class Usuario {
     public void setFechaRegistro(LocalDateTime fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
+
+    public Tecnico getTecnico() {
+        return tecnico;
+    }
+
+    public void setTecnico(Tecnico tecnico) {
+        this.tecnico = tecnico;
+    }
+
 }

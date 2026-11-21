@@ -36,14 +36,36 @@ public class DataInitializer implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         if (usuarioRepository.count() == 0) {
-            usuarioRepository.save(new Usuario("gerente", passwordEncoder.encode("gerente123"),
-                    "Gerente General", "gerente@pairazaman.com", Rol.ROLE_GERENTE));
-            usuarioRepository.save(new Usuario("secretaria", passwordEncoder.encode("secretaria123"),
-                    "Secretaria", "secretaria@pairazaman.com", Rol.ROLE_SECRETARIA));
-            usuarioRepository.save(new Usuario("cobranza", passwordEncoder.encode("cobranza123"),
-                    "Personal de Cobranza", "cobranza@pairazaman.com", Rol.ROLE_COBRANZA));
-            usuarioRepository.save(new Usuario("tecnico", passwordEncoder.encode("tecnico123"),
-                    "Personal Técnico", "tecnico@pairazaman.com", Rol.ROLE_TECNICO));
+            usuarioRepository.save(new Usuario(
+                    "gerente",
+                    passwordEncoder.encode("gerente123"),
+                    "Gerente General",
+                    "gerente@pairazaman.com",
+                    Rol.ROLE_GERENTE
+            ));
+            usuarioRepository.save(new Usuario(
+                    "secretaria",
+                    passwordEncoder.encode("secretaria123"),
+                    "Secretaria",
+                    "secretaria@pairazaman.com",
+                    Rol.ROLE_SECRETARIA
+            ));
+            usuarioRepository.save(new Usuario(
+                    "cobranza",
+                    passwordEncoder.encode("cobranza123"),
+                    "Encargado de Cobranza",
+                    "cobranza@pairazaman.com",
+                    Rol.ROLE_COBRANZA
+            ));
+            Usuario tecnico = new Usuario(
+                    "tecnico",
+                    passwordEncoder.encode("tecnico123"),
+                    "Técnico de Campo",
+                    "tecnico@pairazaman.com",
+                    Rol.ROLE_TECNICO
+            );
+            tecnico.setTecnico(new Tecnico("Técnico de Campo", "999000000"));
+            usuarioRepository.save(tecnico);
         }
 
         if (camaraRepository.count() == 0) {

@@ -1,10 +1,10 @@
 package com.repo.pairazaman.model;
 
 public enum Rol {
-    ROLE_GERENTE("Gerente General"),
+    ROLE_GERENTE("Gerente"),
     ROLE_SECRETARIA("Secretaria"),
-    ROLE_COBRANZA("Personal de Cobranza"),
-    ROLE_TECNICO("Personal Técnico");
+    ROLE_TECNICO("Técnico"),
+    ROLE_COBRANZA("Cobranza");
 
     private final String nombreVisible;
 

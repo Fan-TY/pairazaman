@@ -25,19 +25,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/error").permitAll()
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/", "/dashboard", "/acceso-denegado").authenticated()
-                        .requestMatchers("/clientes/**", "/contratos/**").hasRole("SECRETARIA")
-                        .requestMatchers("/instalaciones/**", "/reclamos/**").hasAnyRole("SECRETARIA", "TECNICO")
-                        .requestMatchers("/incidencias/**").hasRole("TECNICO")
-                        .requestMatchers("/pagos/**").hasRole("COBRANZA")
-                        .requestMatchers("/reportes/**").hasAnyRole("COBRANZA", "GERENTE")
-                        .requestMatchers("/planes/**", "/alertas/**", "/usuarios/**", "/registro/**", "/camaras/**").hasRole("GERENTE")
+                        .requestMatchers("/usuarios/**", "/reportes/**", "/planes/**", "/camaras/**").hasRole("GERENTE")
+                        .requestMatchers("/contratos/**").hasAnyRole("GERENTE", "SECRETARIA")
+                        .requestMatchers("/clientes/**").hasAnyRole("GERENTE", "SECRETARIA", "COBRANZA")
+                        .requestMatchers("/instalaciones/**", "/reclamos/**").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
+                        .requestMatchers("/incidencias/eliminar/**").hasRole("GERENTE")
+                        .requestMatchers("/incidencias/**").hasAnyRole("GERENTE", "TECNICO")
+                        .requestMatchers("/pagos/**", "/alertas/**").hasAnyRole("GERENTE", "COBRANZA")
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
-                        .usernameParameter("username")
-                        .passwordParameter("password")
                         .defaultSuccessUrl("/dashboard", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -46,12 +44,8 @@ public class SecurityConfig {
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/login?logout=true")
                         .invalidateHttpSession(true)
-                        .clearAuthentication(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
-                )
-                .exceptionHandling(ex -> ex
-                        .accessDeniedPage("/acceso-denegado")
                 );
 
         return http.build();

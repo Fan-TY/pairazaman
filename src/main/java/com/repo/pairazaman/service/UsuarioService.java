@@ -1,6 +1,6 @@
 package com.repo.pairazaman.service;
 
-import com.repo.pairazaman.dto.UsuarioRegistroDto;
+import com.repo.pairazaman.dto.UsuarioFormDto;
 import com.repo.pairazaman.model.Usuario;
 
 import java.util.List;
@@ -14,7 +14,15 @@ public interface UsuarioService {
 
     Optional<Usuario> buscarPorUsername(String username);
 
-    Usuario registrar(UsuarioRegistroDto dto);
+    Usuario crear(UsuarioFormDto dto);
+
+    Usuario actualizar(UsuarioFormDto dto, String usernameActual);
+
+    void cambiarEstado(Long id, String usernameActual);
+
+    void restablecerPassword(Long id, String nuevaPassword);
+
+    void cambiarPassword(String username, String actual, String nueva);
 
     boolean existePorUsername(String username);
 
