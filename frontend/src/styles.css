@@ -1,0 +1,301 @@
+:root {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  color: #1f2937;
+  background: #eef2f7;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  background: #0f3d5c;
+  color: #ffffff;
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  letter-spacing: 0.4px;
+}
+
+.app-header p {
+  margin: 4px 0 0;
+  font-size: 0.85rem;
+  opacity: 0.8;
+}
+
+.app-header nav {
+  display: flex;
+  gap: 8px;
+}
+
+.contenido {
+  flex: 1;
+  width: min(1180px, 100% - 32px);
+  margin: 28px auto 48px;
+}
+
+.panel {
+  background: #ffffff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(15, 61, 92, 0.08);
+  padding: 24px;
+}
+
+.panel-titulo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.panel-titulo h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.panel-titulo p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 0.85rem;
+}
+
+button {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0f3d5c;
+  color: #ffffff;
+  transition: background 0.15s ease, opacity 0.15s ease;
+}
+
+button:hover {
+  background: #14527a;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+button.secundario {
+  background: #e2e8f0;
+  color: #1f2937;
+}
+
+button.secundario:hover {
+  background: #cbd5e1;
+}
+
+button.activo {
+  background: #f0b429;
+  color: #1f2937;
+}
+
+.barra-busqueda {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  background: #ffffff;
+  color: #1f2937;
+}
+
+input:focus,
+select:focus {
+  outline: 2px solid rgba(15, 61, 92, 0.35);
+  border-color: #0f3d5c;
+}
+
+.formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 16px;
+}
+
+.formulario label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.formulario label span {
+  color: #334155;
+}
+
+.ancho-completo {
+  grid-column: 1 / -1;
+}
+
+.campo-error {
+  color: #b91c1c;
+  font-weight: 500;
+}
+
+.acciones {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.tabla-contenedor {
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.87rem;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 12px 10px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+th {
+  background: #f8fafc;
+  color: #475569;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+tbody tr:hover {
+  background: #f8fafc;
+}
+
+.acciones-tabla {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.acciones-tabla button {
+  padding: 6px 10px;
+  font-size: 0.78rem;
+}
+
+.etiqueta {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.etiqueta.activa {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.etiqueta.inactiva {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.vacio {
+  text-align: center;
+  color: #64748b;
+  padding: 24px;
+}
+
+.alerta {
+  padding: 12px 14px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+  font-size: 0.87rem;
+}
+
+.alerta.error {
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #991b1b;
+}
+
+.tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+  border-bottom: 1px solid #e2e8f0;
+  padding-bottom: 10px;
+}
+
+.tab {
+  background: transparent;
+  color: #475569;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.tab:hover {
+  background: #f1f5f9;
+}
+
+.tab.activo {
+  background: #0f3d5c;
+  color: #ffffff;
+}
+
+.contador {
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 999px;
+  padding: 0 8px;
+  font-size: 0.72rem;
+}
+
+.tab:not(.activo) .contador {
+  background: #e2e8f0;
+}
+
+@media (max-width: 720px) {
+  .formulario,
+  .barra-busqueda {
+    grid-template-columns: 1fr;
+  }
+
+  .app-header {
+    padding: 16px 20px;
+  }
+}
