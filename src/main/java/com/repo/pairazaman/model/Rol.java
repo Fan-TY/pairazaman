@@ -1,12 +1,10 @@
 package com.repo.pairazaman.model;
 
-/**
- * Roles del sistema para autorización y control de acceso.
- */
 public enum Rol {
-    ROLE_ADMIN("Administrador"),
-    ROLE_SUPERVISOR("Supervisor"),
-    ROLE_OPERADOR("Operador");
+    ROLE_GERENTE("Gerente General"),
+    ROLE_SECRETARIA("Secretaria"),
+    ROLE_COBRANZA("Personal de Cobranza"),
+    ROLE_TECNICO("Personal Técnico");
 
     private final String nombreVisible;
 

@@ -1,10 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Inicio - Cobranza</title>
 </head>
-<body>
-$END$
-</body>
+  <body>
+    <th:block th:fragment="content">
+      <div th:replace="~{layout/componentes :: encabezado('Panel de Cobranza', 'Registro de pagos y seguimiento de cuentas', 'bi-cash-coin', 'inicio-cobranza')}"></div>
+
+      <div class="row g-3">
+        <div class="col-12 col-md-6">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-cash-coin', 'Pagos', 'Registra pagos de mensualidades e instalación y emite comprobantes.', '/pagos', 'success')}"></th:block>
+        </div>
+        <div class="col-12 col-md-6">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-bar-chart-fill', 'Reportes', 'Consulta ingresos del día o mes y pagos pendientes.', '/reportes', 'primary')}"></th:block>
+        </div>
+      </div>
+    </th:block>
+  </body>
 </html>

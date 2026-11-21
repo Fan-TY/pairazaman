@@ -1,10 +1,18 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
 <head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
+  <title>Acceso denegado</title>
 </head>
-<body>
-$END$
-</body>
+  <body>
+    <th:block th:fragment="content">
+      <div class="text-center py-5">
+        <i class="bi bi-shield-lock-fill text-danger display-1"></i>
+        <h3 class="fw-bold mt-3">Acceso denegado</h3>
+        <p class="text-muted">Tu perfil no tiene permiso para ver esta pantalla.</p>
+        <a th:href="@{/dashboard}" class="btn btn-primary">
+          <i class="bi bi-house-door me-1"></i> Volver al inicio
+        </a>
+      </div>
+    </th:block>
+  </body>
 </html>

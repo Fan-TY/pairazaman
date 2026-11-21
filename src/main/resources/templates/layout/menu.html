@@ -1,10 +1,33 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <body>
+        <ul th:fragment="menu" class="navbar-nav me-auto mb-2 mb-xl-0 ms-xl-3">
+            <li class="nav-item">
+                <a class="nav-link" th:href="@{/dashboard}" aria-label="Inicio" title="Inicio">
+                    <i class="bi bi-house-door-fill"></i>
+                </a>
+            </li>
+            <li th:replace="~{layout/menu :: item('bi-people-fill', 'Clientes', '/clientes', ${#authorization.expression('hasRole(''SECRETARIA'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-file-earmark-text-fill', 'Contratos', '/contratos', ${#authorization.expression('hasRole(''SECRETARIA'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-tools', 'Instalaciones', '/instalaciones', ${#authorization.expression('hasAnyRole(''SECRETARIA'',''TECNICO'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-chat-left-text-fill', 'Reclamos', '/reclamos', ${#authorization.expression('hasAnyRole(''SECRETARIA'',''TECNICO'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-exclamation-triangle-fill', 'Incidencias', '/incidencias', ${#authorization.expression('hasRole(''TECNICO'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-cash-coin', 'Pagos', '/pagos', ${#authorization.expression('hasRole(''COBRANZA'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-bar-chart-fill', 'Reportes', '/reportes', ${#authorization.expression('hasAnyRole(''COBRANZA'',''GERENTE'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-wifi', 'Planes', '/planes', ${#authorization.expression('hasRole(''GERENTE'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-bell-fill', 'Alertas', '/alertas', ${#authorization.expression('hasRole(''GERENTE'')')})}"></li>
+            <li th:replace="~{layout/menu :: item('bi-person-gear', 'Usuarios', '/usuarios', ${#authorization.expression('hasRole(''GERENTE'')')})}"></li>
+        </ul>
+
+        <li th:fragment="item(icono, texto, url, permitido)" class="nav-item"
+            th:classappend="${!permitido} ? 'item-bloqueado'"
+            th:title="${!permitido} ? 'No tienes acceso a este módulo'">
+            <a th:if="${permitido}" class="nav-link" th:href="@{${url}}">
+                <i th:class="'bi ' + ${icono} + ' me-1'"></i><span th:text="${texto}">Módulo</span>
+            </a>
+            <a th:unless="${permitido}" class="nav-link disabled" aria-disabled="true" tabindex="-1">
+                <i th:class="'bi ' + ${icono} + ' me-1'"></i><span th:text="${texto}">Módulo</span>
+            </a>
+        </li>
+    </body>
 </html>

@@ -2,6 +2,8 @@ package com.repo.pairazaman.controller;
 
 import com.repo.pairazaman.dto.UsuarioRegistroDto;
 import com.repo.pairazaman.service.UsuarioService;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,14 +24,24 @@ public class AuthController {
     @GetMapping("/login")
     public String login(@RequestParam(value = "error", required = false) String error,
                         @RequestParam(value = "logout", required = false) String logout,
+                        Authentication authentication,
                         Model model) {
+        if (authentication != null && authentication.isAuthenticated()
+                && !(authentication instanceof AnonymousAuthenticationToken)) {
+            return "redirect:/dashboard";
+        }
         if (error != null) {
-            model.addAttribute("mensajeError", "Credenciales incorrectas o usuario inactivo.");
+            model.addAttribute("mensajeError", "Usuario o contraseña incorrectos, o usuario inactivo.");
         }
         if (logout != null) {
-            model.addAttribute("mensajeExito", "Has cerrado sesión correctamente.");
+            model.addAttribute("mensajeExito", "Cerraste sesión correctamente.");
         }
         return "auth/login";
+    }
+
+    @GetMapping("/acceso-denegado")
+    public String accesoDenegado() {
+        return "acceso-denegado";
     }
 
     @GetMapping("/registro")
@@ -49,7 +61,7 @@ public class AuthController {
 
         try {
             usuarioService.registrar(dto);
-            redirectAttributes.addFlashAttribute("mensajeExito", "Usuario registrado exitosamente. Ya puedes iniciar sesión.");
+            redirectAttributes.addFlashAttribute("mensajeExito", "Usuario registrado exitosamente.");
             return "redirect:/login";
         } catch (IllegalArgumentException ex) {
             model.addAttribute("mensajeError", ex.getMessage());

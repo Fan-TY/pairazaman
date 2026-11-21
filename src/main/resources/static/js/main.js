@@ -1,6 +1,4 @@
-// Scripts generales del cliente para Pairazamán MVC
 document.addEventListener('DOMContentLoaded', function () {
-    // Auto-cierre de alertas flash después de 5 segundos
     const alerts = document.querySelectorAll('.alert-dismissible');
     alerts.forEach(function (alert) {
         setTimeout(function () {
@@ -9,5 +7,13 @@ document.addEventListener('DOMContentLoaded', function () {
                 bsAlert.close();
             }
         }, 5000);
+    });
+
+    const path = window.location.pathname;
+    document.querySelectorAll('#navbarContent .navbar-nav .nav-link[href]').forEach(function (link) {
+        const href = link.getAttribute('href');
+        if (href && href !== '#' && (path === href || path.startsWith(href + '/'))) {
+            link.classList.add('active');
+        }
     });
 });

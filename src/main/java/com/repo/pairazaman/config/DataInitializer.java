@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 
-/**
- * Inicializador de datos de demostración para el primer arranque del sistema.
- */
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -38,27 +35,17 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Inicializar Usuarios
         if (usuarioRepository.count() == 0) {
-            Usuario admin = new Usuario(
-                    "admin",
-                    passwordEncoder.encode("admin123"),
-                    "Administrador General",
-                    "admin@pairazaman.com",
-                    Rol.ROLE_ADMIN
-            );
-            Usuario operador = new Usuario(
-                    "operador",
-                    passwordEncoder.encode("operador123"),
-                    "Operador de Monitoreo",
-                    "operador@pairazaman.com",
-                    Rol.ROLE_OPERADOR
-            );
-            usuarioRepository.save(admin);
-            usuarioRepository.save(operador);
+            usuarioRepository.save(new Usuario("gerente", passwordEncoder.encode("gerente123"),
+                    "Gerente General", "gerente@pairazaman.com", Rol.ROLE_GERENTE));
+            usuarioRepository.save(new Usuario("secretaria", passwordEncoder.encode("secretaria123"),
+                    "Secretaria", "secretaria@pairazaman.com", Rol.ROLE_SECRETARIA));
+            usuarioRepository.save(new Usuario("cobranza", passwordEncoder.encode("cobranza123"),
+                    "Personal de Cobranza", "cobranza@pairazaman.com", Rol.ROLE_COBRANZA));
+            usuarioRepository.save(new Usuario("tecnico", passwordEncoder.encode("tecnico123"),
+                    "Personal Técnico", "tecnico@pairazaman.com", Rol.ROLE_TECNICO));
         }
 
-        // Inicializar Cámaras
         if (camaraRepository.count() == 0) {
             camaraRepository.save(new Camara("CAM-01", "Acceso Principal - Puerta A", "192.168.1.101", "OPERATIVA"));
             camaraRepository.save(new Camara("CAM-02", "Estacionamiento Norte", "192.168.1.102", "OPERATIVA"));
@@ -67,9 +54,8 @@ public class DataInitializer implements CommandLineRunner {
             camaraRepository.save(new Camara("CAM-05", "Perímetro Posterior", "192.168.1.105", "DESCONECTADA"));
         }
 
-        // Inicializar Incidencias de prueba
         if (incidenciaRepository.count() == 0) {
-            Usuario admin = usuarioRepository.findByUsername("admin").orElse(null);
+            Usuario gerente = usuarioRepository.findByUsername("gerente").orElse(null);
             Camara cam1 = camaraRepository.findByCodigo("CAM-01").orElse(null);
             Camara cam2 = camaraRepository.findByCodigo("CAM-02").orElse(null);
 
@@ -83,7 +69,7 @@ public class DataInitializer implements CommandLineRunner {
             inc1.setEstado(EstadoIncidencia.PENDIENTE);
             inc1.setUbicacion("Puerta A - Garita Principal");
             if (cam1 != null) inc1.setCamaraId(cam1.getId());
-            incidenciaService.registrar(inc1, admin);
+            incidenciaService.registrar(inc1, gerente);
 
             IncidenciaDto inc2 = new IncidenciaDto();
             inc2.setTitulo("Avería en luminaria de estacionamiento");
@@ -95,7 +81,7 @@ public class DataInitializer implements CommandLineRunner {
             inc2.setEstado(EstadoIncidencia.EN_PROCESO);
             inc2.setUbicacion("Estacionamiento Norte");
             if (cam2 != null) inc2.setCamaraId(cam2.getId());
-            incidenciaService.registrar(inc2, admin);
+            incidenciaService.registrar(inc2, gerente);
 
             IncidenciaDto inc3 = new IncidenciaDto();
             inc3.setTitulo("Mochila olvidada en banco de espera");
@@ -106,7 +92,7 @@ public class DataInitializer implements CommandLineRunner {
             inc3.setPrioridad(Prioridad.BAJA);
             inc3.setEstado(EstadoIncidencia.RESUELTO);
             inc3.setUbicacion("Hall de Espera Principal");
-            incidenciaService.registrar(inc3, admin);
+            incidenciaService.registrar(inc3, gerente);
         }
     }
 }

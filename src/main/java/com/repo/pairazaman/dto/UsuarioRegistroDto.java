@@ -2,9 +2,6 @@ package com.repo.pairazaman.dto;
 
 import com.repo.pairazaman.model.Rol;
 
-/**
- * DTO para el registro de nuevos usuarios en el sistema.
- */
 public class UsuarioRegistroDto {
 
     private String username;
@@ -15,7 +12,7 @@ public class UsuarioRegistroDto {
     private Rol rol;
 
     public UsuarioRegistroDto() {
-        this.rol = Rol.ROLE_OPERADOR;
+        this.rol = Rol.ROLE_SECRETARIA;
     }
 
     public String getUsername() {
