@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security" th:fragment="layout(content)">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Pairazaman - Sistema de Gestión de Clientes y Servicios</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+        <link rel="stylesheet" th:href="@{/css/style.css}">
+    </head>
+    <body class="d-flex flex-column min-vh-100">
+
+        <nav class="navbar navbar-expand-lg navbar-dark navbar-pz sticky-top">
+            <div class="container-fluid px-4">
+                <a class="navbar-brand d-flex align-items-center me-lg-3" th:href="@{/dashboard}" title="Ir al inicio">
+                    <img th:src="@{/images/logo.png}" alt="Telecomunicaciones Pairazaman S.A.C." class="brand-logo">
+                </a>
+
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarContent"
+                        aria-controls="navbarContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="navbarContent">
+                    <ul class="navbar-nav me-auto mb-3 mb-lg-0 ms-lg-5 gap-lg-4">
+                        <li class="nav-item dropdown" sec:authorize="hasAnyRole('GERENTE')">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-briefcase-fill me-1"></i> Gerente
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark pz-menu">
+                                <li><h6 class="dropdown-header">Opciones de Gerente</h6></li>
+                                <li><a class="dropdown-item" th:href="@{/reportes}"><i class="bi bi-bar-chart-fill"></i> Reportes</a></li>
+                                <li><a class="dropdown-item" th:href="@{/planes}"><i class="bi bi-wifi"></i> Planes</a></li>
+                                <li><a class="dropdown-item" th:href="@{/alertas}"><i class="bi bi-bell-fill"></i> Alertas</a></li>
+                                <li><a class="dropdown-item" th:href="@{/usuarios}"><i class="bi bi-people-fill"></i> Usuarios</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item" sec:authorize="!hasAnyRole('GERENTE')">
+                                <span class="nav-link disabled" aria-disabled="true" title="Sin acceso para tu rol">
+                                    <i class="bi bi-lock-fill me-1"></i> Gerente
+                                </span>
+                        </li>
+
+                        <li class="nav-item dropdown" sec:authorize="hasAnyRole('GERENTE','SECRETARIA')">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-person-workspace me-1"></i> Secretaria
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark pz-menu">
+                                <li><h6 class="dropdown-header">Opciones de Secretaria</h6></li>
+                                <li><a class="dropdown-item" th:href="@{/clientes}"><i class="bi bi-people-fill"></i> Clientes</a></li>
+                                <li><a class="dropdown-item" th:href="@{/contratos}"><i class="bi bi-file-earmark-text-fill"></i> Contratos</a></li>
+                                <li><a class="dropdown-item" th:href="@{/instalaciones}"><i class="bi bi-tools"></i> Instalaciones</a></li>
+                                <li><a class="dropdown-item" th:href="@{/reclamos}"><i class="bi bi-flag-fill"></i> Reclamos</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item" sec:authorize="!hasAnyRole('GERENTE','SECRETARIA')">
+                                <span class="nav-link disabled" aria-disabled="true" title="Sin acceso para tu rol">
+                                    <i class="bi bi-lock-fill me-1"></i> Secretaria
+                                </span>
+                        </li>
+
+                        <li class="nav-item dropdown" sec:authorize="hasAnyRole('GERENTE','TECNICO')">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-wrench-adjustable me-1"></i> Técnico
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark pz-menu">
+                                <li><h6 class="dropdown-header">Opciones de Técnico</h6></li>
+                                <li><a class="dropdown-item" th:href="@{/instalaciones}"><i class="bi bi-tools"></i> Instalaciones</a></li>
+                                <li><a class="dropdown-item" th:href="@{/incidencias}"><i class="bi bi-exclamation-triangle-fill"></i> Incidencias</a></li>
+                                <li><a class="dropdown-item" th:href="@{/reclamos}"><i class="bi bi-flag-fill"></i> Reclamos</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item" sec:authorize="!hasAnyRole('GERENTE','TECNICO')">
+                                <span class="nav-link disabled" aria-disabled="true" title="Sin acceso para tu rol">
+                                    <i class="bi bi-lock-fill me-1"></i> Técnico
+                                </span>
+                        </li>
+
+                        <li class="nav-item dropdown" sec:authorize="hasAnyRole('GERENTE','COBRANZA')">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="bi bi-cash-coin me-1"></i> Cobranza
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark pz-menu">
+                                <li><h6 class="dropdown-header">Opciones de Cobranza</h6></li>
+                                <li><a class="dropdown-item" th:href="@{/pagos}"><i class="bi bi-credit-card-fill"></i> Pagos</a></li>
+                                <li><a class="dropdown-item" th:href="@{/alertas}"><i class="bi bi-bell-fill"></i> Alertas</a></li>
+                                <li><a class="dropdown-item" th:href="@{/clientes}"><i class="bi bi-people-fill"></i> Clientes</a></li>
+                            </ul>
+                        </li>
+                        <li class="nav-item" sec:authorize="!hasAnyRole('GERENTE','COBRANZA')">
+                                <span class="nav-link disabled" aria-disabled="true" title="Sin acceso para tu rol">
+                                    <i class="bi bi-lock-fill me-1"></i> Cobranza
+                                </span>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex align-items-center gap-2">
+                        <div sec:authorize="isAuthenticated()" class="d-flex align-items-center gap-2">
+                            <a th:href="@{/cuenta/password}" class="pz-user text-decoration-none" title="Cambiar contraseña">
+                                <i class="bi bi-person-circle"></i>
+                                <span sec:authentication="name">Usuario</span>
+                            </a>
+                            <form th:action="@{/logout}" method="post" class="m-0">
+                                <button type="submit" class="pz-logout">
+                                    <i class="bi bi-box-arrow-right me-1"></i> Salir
+                                </button>
+                            </form>
+                        </div>
+                        <div sec:authorize="!isAuthenticated()">
+                            <a th:href="@{/login}" class="btn btn-pz btn-sm px-3">
+                                <i class="bi bi-box-arrow-in-right me-1"></i> Iniciar Sesión
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <main class="flex-grow-1 py-4">
+            <div class="container-fluid px-4">
+                <div th:if="${mensajeExito}" class="alert alert-success alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <span th:text="${mensajeExito}">Operación exitosa.</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <div th:if="${mensajeError}" class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+                    <i class="bi bi-exclamation-octagon-fill me-2"></i>
+                    <span th:text="${mensajeError}">Ocurrió un error.</span>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+
+                <th:block th:replace="${content}"></th:block>
+            </div>
+        </main>
+
+        <th:block th:replace="~{layout/footer :: footer}"></th:block>
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+        <script th:src="@{/js/main.js}"></script>
+    </body>
+</html>

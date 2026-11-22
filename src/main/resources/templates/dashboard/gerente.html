@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Inicio - Gerente General</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div th:replace="~{layout/componentes :: encabezado('Panel del Gerente General', 'Supervisión del negocio, planes, alertas y usuarios del sistema', 'bi-briefcase-fill', 'inicio-gerente')}"></div>
+
+      <div class="row g-3">
+        <div class="col-12 col-md-6 col-xl-3">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-bar-chart-fill', 'Reportes e indicadores', 'Clientes activos, ingresos, pagos pendientes y fallas reportadas.', '/reportes', 'primary')}"></th:block>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-wifi', 'Planes', 'Administra el catálogo de planes de internet, TV y combos.', '/planes', 'success')}"></th:block>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-bell-fill', 'Alertas', 'Pagos vencidos, interrupciones y vencimiento de contratos.', '/alertas', 'warning')}"></th:block>
+        </div>
+        <div class="col-12 col-md-6 col-xl-3">
+          <th:block th:replace="~{layout/componentes :: acceso('bi-person-gear', 'Usuarios', 'Crea, edita y desactiva usuarios y asigna sus roles.', '/usuarios', 'danger')}"></th:block>
+        </div>
+      </div>
+    </th:block>
+  </body>
+</html>

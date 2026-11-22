@@ -16,7 +16,7 @@ import java.util.Map;
  * Respuestas de error uniformes para la API de clientes.
  */
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class ClienteExceptionHandler {
 
     @ExceptionHandler(RecursoNoEncontradoException.class)
     public ResponseEntity<Map<String, Object>> noEncontrado(RecursoNoEncontradoException ex) {

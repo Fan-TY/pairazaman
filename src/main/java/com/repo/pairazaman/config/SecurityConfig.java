@@ -2,33 +2,61 @@ package com.repo.pairazaman.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 
-/**
- * Configuración temporal de seguridad para el módulo de clientes.
- *
- * <p>El proyecto incluye spring-boot-starter-security. Sin esta configuración,
- * todos los endpoints quedarían protegidos con autenticación básica y el
- * frontend recibiría 401. Cuando se implemente el módulo de usuarios/roles,
- * se debe restringir /api/clientes a los roles correspondientes.</p>
- */
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                // API REST sin sesión ni formularios: CSRF no aplica.
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                        session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                // La API REST de clientes se consume desde React sin token CSRF.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/api/**"))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/error").permitAll()
+                        .requestMatchers("/login").permitAll()
+                        // Módulo de clientes (React) — se protegerá por roles cuando el frontend
+                        // integre el login. Por ahora queda accesible para no romper la API.
                         .requestMatchers("/api/**").permitAll()
-                        .anyRequest().permitAll());
+                        .requestMatchers("/usuarios/**", "/reportes/**", "/planes/**", "/alertas/**").hasRole("GERENTE")
+                        .requestMatchers("/camaras/**").hasRole("GERENTE")
+                        .requestMatchers("/contratos/**").hasAnyRole("GERENTE", "SECRETARIA")
+                        .requestMatchers("/clientes/**").hasAnyRole("GERENTE", "SECRETARIA", "COBRANZA")
+                        .requestMatchers("/instalaciones/**", "/reclamos/**").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
+                        .requestMatchers("/incidencias/eliminar/**").hasRole("GERENTE")
+                        .requestMatchers("/incidencias/**").hasAnyRole("GERENTE", "TECNICO")
+                        .requestMatchers("/pagos/**").hasAnyRole("GERENTE", "COBRANZA")
+                        .anyRequest().authenticated()
+                )
+                .formLogin(login -> login
+                        .loginPage("/login")
+                        .usernameParameter("email")
+                        .defaultSuccessUrl("/dashboard", true)
+                        .failureUrl("/login?error=true")
+                        .permitAll()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessUrl("/login?logout=true")
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/acceso-denegado")
+                );
 
         return http.build();
     }
