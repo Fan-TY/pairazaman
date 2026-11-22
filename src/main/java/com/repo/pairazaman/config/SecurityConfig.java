@@ -25,17 +25,19 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/css/**", "/js/**", "/images/**", "/webjars/**", "/error").permitAll()
                         .requestMatchers("/login").permitAll()
-                        .requestMatchers("/usuarios/**", "/reportes/**", "/planes/**", "/camaras/**").hasRole("GERENTE")
+                        .requestMatchers("/usuarios/**", "/reportes/**", "/planes/**", "/alertas/**").hasRole("GERENTE")
+                        .requestMatchers("/camaras/**").hasRole("GERENTE")
                         .requestMatchers("/contratos/**").hasAnyRole("GERENTE", "SECRETARIA")
                         .requestMatchers("/clientes/**").hasAnyRole("GERENTE", "SECRETARIA", "COBRANZA")
                         .requestMatchers("/instalaciones/**", "/reclamos/**").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
                         .requestMatchers("/incidencias/eliminar/**").hasRole("GERENTE")
                         .requestMatchers("/incidencias/**").hasAnyRole("GERENTE", "TECNICO")
-                        .requestMatchers("/pagos/**", "/alertas/**").hasAnyRole("GERENTE", "COBRANZA")
+                        .requestMatchers("/pagos/**").hasAnyRole("GERENTE", "COBRANZA")
                         .anyRequest().authenticated()
                 )
                 .formLogin(login -> login
                         .loginPage("/login")
+                        .usernameParameter("email")
                         .defaultSuccessUrl("/dashboard", true)
                         .failureUrl("/login?error=true")
                         .permitAll()
@@ -46,6 +48,9 @@ public class SecurityConfig {
                         .invalidateHttpSession(true)
                         .deleteCookies("JSESSIONID")
                         .permitAll()
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedPage("/acceso-denegado")
                 );
 
         return http.build();

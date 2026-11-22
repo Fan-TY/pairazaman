@@ -13,7 +13,7 @@ public class AuthController {
                         @RequestParam(value = "logout", required = false) String logout,
                         Model model) {
         if (error != null) {
-            model.addAttribute("mensajeError", "Credenciales incorrectas o usuario inactivo.");
+            model.addAttribute("mensajeError", "Correo o contraseña incorrectos, o usuario inactivo.");
         }
         if (logout != null) {
             model.addAttribute("mensajeExito", "Has cerrado sesión correctamente.");
