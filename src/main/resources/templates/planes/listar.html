@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Planes</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Catálogo de planes</h2>
+          <p class="text-muted mb-0">
+            Planes de internet, cable y combos que se ofrecen a los clientes.
+            <span class="badge bg-success-subtle text-success ms-1"><span th:text="${totalActivos}">0</span> activos</span>
+          </p>
+        </div>
+        <a th:href="@{/planes/nuevo}" class="btn btn-pz px-4">
+          <i class="bi bi-plus-lg me-1"></i> Nuevo plan
+        </a>
+      </div>
+
+      <ul class="nav nav-pills mb-3 gap-1">
+        <li class="nav-item">
+          <a class="nav-link" th:classappend="${tipoSeleccionado == null} ? 'active'" th:href="@{/planes}">Todos</a>
+        </li>
+        <li class="nav-item" th:each="t : ${tipos}">
+          <a class="nav-link" th:classappend="${tipoSeleccionado == t} ? 'active'"
+             th:href="@{/planes(tipo=${t})}" th:text="${t.nombreVisible}">Tipo</a>
+        </li>
+      </ul>
+
+      <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+            <tr>
+              <th class="ps-4">Plan</th>
+              <th>Tipo</th>
+              <th>Velocidad</th>
+              <th>Canales</th>
+              <th class="text-end">Mensualidad</th>
+              <th class="text-end">Instalación</th>
+              <th>Estado</th>
+              <th class="text-end pe-4">Acciones</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:if="${#lists.isEmpty(planes)}">
+              <td colspan="8" class="text-center py-4 text-muted">No hay planes registrados.</td>
+            </tr>
+            <tr th:each="p : ${planes}" th:classappend="${!p.activo} ? 'text-muted'">
+              <td class="ps-4">
+                <strong th:text="${p.nombre}">Plan</strong>
+                <small class="text-muted d-block" th:if="${p.descripcion}" th:text="${p.descripcion}">descripción</small>
+              </td>
+              <td>
+                <span class="badge"
+                      th:classappend="${p.tipo.name() == 'INTERNET'} ? 'bg-primary' : (${p.tipo.name() == 'TV'} ? 'bg-info text-dark' : 'bg-warning text-dark')"
+                      th:text="${p.tipo.nombreVisible}">Tipo</span>
+              </td>
+              <td th:text="${p.velocidadMbps != null} ? ${p.velocidadMbps} + ' Mbps' : '—'">—</td>
+              <td th:text="${p.cantidadCanales != null} ? ${p.cantidadCanales} : '—'">—</td>
+              <td class="text-end fw-semibold" th:text="'S/ ' + ${#numbers.formatDecimal(p.precioMensual, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</td>
+              <td class="text-end" th:text="'S/ ' + ${#numbers.formatDecimal(p.costoInstalacion, 1, 'COMMA', 2, 'POINT')}">S/ 0.00</td>
+              <td>
+                <span th:if="${p.activo}" class="badge bg-success">Activo</span>
+                <span th:unless="${p.activo}" class="badge bg-secondary">Inactivo</span>
+              </td>
+              <td class="text-end pe-4">
+                <div class="d-inline-flex gap-1">
+                  <a th:href="@{'/planes/editar/' + ${p.id}}" class="btn btn-sm btn-outline-primary" title="Editar">
+                    <i class="bi bi-pencil-square"></i>
+                  </a>
+                  <button th:if="${p.activo}" type="button" class="btn btn-sm btn-outline-danger" title="Desactivar"
+                          data-bs-toggle="modal" th:attr="data-bs-target='#estado' + ${p.id}">
+                    <i class="bi bi-toggle-on"></i>
+                  </button>
+                  <form th:unless="${p.activo}" th:action="@{'/planes/' + ${p.id} + '/estado'}" method="post" class="m-0">
+                    <button type="submit" class="btn btn-sm btn-outline-success" title="Activar">
+                      <i class="bi bi-toggle-off"></i>
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <th:block th:each="p : ${planes}">
+        <div th:if="${p.activo}" class="modal fade" th:id="'estado' + ${p.id}" tabindex="-1" aria-hidden="true">
+          <div class="modal-dialog modal-dialog-centered">
+            <form th:action="@{'/planes/' + ${p.id} + '/estado'}" method="post" class="modal-content border-0 shadow">
+              <div class="modal-header">
+                <h5 class="modal-title fw-bold">Desactivar plan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+              </div>
+              <div class="modal-body">
+                <p class="mb-0">
+                  ¿Seguro que quieres desactivar <strong th:text="${p.nombre}">plan</strong>?
+                  Ya no aparecerá para contratos nuevos, pero los clientes que lo tienen no se ven afectados.
+                </p>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+                <button type="submit" class="btn btn-danger px-4">Desactivar</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </th:block>
+    </th:block>
+  </body>
+</html>

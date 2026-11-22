@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Plan</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-8 col-xl-7">
+          <div class="mb-4">
+            <h2 class="fw-bold mb-1" th:text="${editando} ? 'Editar plan' : 'Nuevo plan'">Nuevo plan</h2>
+            <p class="text-muted mb-0">Datos del plan que se ofrecerá a los clientes.</p>
+          </div>
+
+          <div class="card border-0 shadow-sm">
+            <div class="card-body p-4">
+              <form th:action="@{/planes/guardar}" th:object="${plan}" method="post">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-7">
+                    <label for="nombre" class="form-label fw-semibold small">Nombre del plan</label>
+                    <input type="text" class="form-control" id="nombre" th:field="*{nombre}"
+                           placeholder="Ej: Internet Hogar 100 Mbps" maxlength="80" required>
+                  </div>
+                  <div class="col-12 col-md-5">
+                    <label for="tipo" class="form-label fw-semibold small">Tipo</label>
+                    <select class="form-select" id="tipo" th:field="*{tipo}" required>
+                      <option value="" disabled>Selecciona un tipo</option>
+                      <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.nombreVisible}"
+                              th:attr="data-internet=${t.tieneInternet()},data-tv=${t.tieneTv()}">Tipo</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-6" id="grupoVelocidad">
+                    <label for="velocidadMbps" class="form-label fw-semibold small">Velocidad (Mbps)</label>
+                    <input type="number" class="form-control" id="velocidadMbps" th:field="*{velocidadMbps}" min="1" step="1">
+                  </div>
+                  <div class="col-12 col-md-6" id="grupoCanales">
+                    <label for="cantidadCanales" class="form-label fw-semibold small">Cantidad de canales</label>
+                    <input type="number" class="form-control" id="cantidadCanales" th:field="*{cantidadCanales}" min="1" step="1">
+                  </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                  <div class="col-12 col-md-6">
+                    <label for="precioMensual" class="form-label fw-semibold small">Precio mensual (S/)</label>
+                    <input type="number" class="form-control" id="precioMensual" th:field="*{precioMensual}"
+                           min="0.01" step="0.01" required>
+                  </div>
+                  <div class="col-12 col-md-6">
+                    <label for="costoInstalacion" class="form-label fw-semibold small">Costo de instalación (S/)</label>
+                    <input type="number" class="form-control" id="costoInstalacion" th:field="*{costoInstalacion}"
+                           min="0" step="0.01">
+                  </div>
+                </div>
+
+                <div class="mb-4">
+                  <label for="descripcion" class="form-label fw-semibold small">Descripción <span class="text-muted fw-normal">(opcional)</span></label>
+                  <textarea class="form-control" id="descripcion" th:field="*{descripcion}" rows="2" maxlength="255"
+                            placeholder="Beneficios, condiciones o zonas de cobertura"></textarea>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                  <a th:href="@{/planes}" class="btn btn-light px-4">Cancelar</a>
+                  <button type="submit" class="btn btn-pz px-4">
+                    <i class="bi bi-check2-circle me-1"></i> Guardar
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        (function () {
+            var tipo = document.getElementById('tipo');
+            var velocidad = document.getElementById('velocidadMbps');
+            var canales = document.getElementById('cantidadCanales');
+            function actualizar() {
+                var op = tipo.options[tipo.selectedIndex];
+                var internet = op && op.dataset.internet === 'true';
+                var tv = op && op.dataset.tv === 'true';
+                document.getElementById('grupoVelocidad').classList.toggle('d-none', !internet);
+                document.getElementById('grupoCanales').classList.toggle('d-none', !tv);
+                velocidad.required = internet;
+                canales.required = tv;
+            }
+            tipo.addEventListener('change', actualizar);
+            actualizar();
+        })();
+      </script>
+    </th:block>
+  </body>
+</html>
