@@ -1,11 +1,11 @@
 # Pairazaman — Gestión de Clientes (RF-01 / ECU-01)
 
-Módulo de clientes con backend **Spring Boot + MySQL** y frontend **React + Vite**.
+Módulo de clientes con backend **Spring Boot + PostgreSQL** y frontend **React + Vite**.
 
 ## Requisitos
 
 - Java 17+
-- MySQL 8+
+- PostgreSQL 14+
 - Node.js 18+
 
 ## 1. Base de datos
@@ -13,16 +13,16 @@ Módulo de clientes con backend **Spring Boot + MySQL** y frontend **React + Vit
 Crea la base de datos (Hibernate crea las tablas con `ddl-auto=update`):
 
 ```sql
-CREATE DATABASE pairazaman CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE pairazaman_db;
 ```
 
 Credenciales por defecto en `src/main/resources/application.properties`:
 
 | Variable | Valor por defecto |
 |---|---|
-| `DB_URL` | `jdbc:mysql://localhost:3306/pairazaman?...` |
-| `DB_USER` | `root` |
-| `DB_PASSWORD` | *(vacío)* |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/pairazaman_db` |
+| `DB_USERNAME` | `postgres` |
+| `DB_PASSWORD` | `postgres` |
 
 Puedes sobreescribirlas con variables de entorno.
 
