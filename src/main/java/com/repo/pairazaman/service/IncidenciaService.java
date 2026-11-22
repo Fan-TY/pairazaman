@@ -19,7 +19,7 @@ public interface IncidenciaService {
 
     Incidencia actualizar(Long id, IncidenciaDto dto);
 
-    Incidencia cambiarEstado(Long id, EstadoIncidencia nuevoEstado);
+    void cambiarEstado(Long id, EstadoIncidencia nuevoEstado);
 
     void eliminar(Long id);
 
