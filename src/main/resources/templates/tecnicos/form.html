@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title th:text="${tituloVista}">Técnico</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0" th:text="${tituloVista}">Registrar técnico</h5>
+                        <a th:href="@{/tecnicos}" class="btn btn-outline-secondary btn-sm">Regresar</a>
+                    </div>
+                    <div class="card-body p-4">
+                        <form th:action="@{/tecnicos/guardar}" th:object="${tecnicoDto}" method="post">
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label for="nombreCompleto" class="form-label fw-semibold">Nombre completo <span class="text-danger">*</span></label>
+                                <input type="text" id="nombreCompleto" th:field="*{nombreCompleto}" class="form-control" maxlength="120" required>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="telefono" class="form-label fw-semibold">Teléfono</label>
+                                <input type="text" id="telefono" th:field="*{telefono}" class="form-control" maxlength="20" placeholder="Ej: 999 000 000">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="zona" class="form-label fw-semibold">Zona de trabajo <span class="text-danger">*</span></label>
+                                <input type="text" id="zona" th:field="*{zona}" class="form-control" maxlength="100" required placeholder="Ej: Talara Norte">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="disponibilidad" class="form-label fw-semibold">Disponibilidad</label>
+                                <select id="disponibilidad" th:field="*{disponibilidad}" class="form-select">
+                                    <option th:each="d : ${disponibilidades}" th:value="${d}" th:text="${d.etiqueta}"></option>
+                                </select>
+                                <div class="form-text">Un técnico "No disponible" no se puede asignar a nuevas órdenes.</div>
+                            </div>
+
+                            <div class="form-check mb-4">
+                                <input class="form-check-input" type="checkbox" id="activo" th:field="*{activo}">
+                                <label class="form-check-label" for="activo">Técnico activo</label>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                                <a th:href="@{/tecnicos}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary px-4">Guardar técnico</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

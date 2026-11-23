@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title>Personal técnico</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h2 class="fw-bold mb-1">Personal técnico</h2>
+                <p class="text-muted mb-0">Datos, zona de trabajo y disponibilidad de los técnicos.</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/instalaciones}" class="btn btn-outline-secondary shadow-sm">
+                    <i class="bi bi-tools me-1"></i> Instalaciones
+                </a>
+                <a th:href="@{/tecnicos/nuevo}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Registrar técnico
+                </a>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Nombre</th>
+                                <th scope="col">Teléfono</th>
+                                <th scope="col">Zona</th>
+                                <th scope="col">Disponibilidad</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col" class="text-end pe-4">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(tecnicos)}">
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <i class="bi bi-person-x fs-1 d-block mb-2"></i>
+                                    Aún no hay técnicos registrados.
+                                </td>
+                            </tr>
+                            <tr th:each="t : ${tecnicos}">
+                                <td class="ps-4 fw-semibold" th:text="${t.nombreCompleto}">Nombre</td>
+                                <td th:text="${t.telefono != null} ? ${t.telefono} : '—'">999 000 000</td>
+                                <td th:text="${t.zona != null} ? ${t.zona} : '—'">Zona</td>
+                                <td>
+                                    <form th:action="@{'/tecnicos/' + ${t.id} + '/disponibilidad'}" method="post" class="m-0">
+                                        <select name="disponibilidad" class="form-select form-select-sm" style="max-width: 180px;"
+                                                onchange="this.form.submit()">
+                                            <option th:each="d : ${disponibilidades}" th:value="${d}" th:text="${d.etiqueta}"
+                                                    th:selected="${d == t.disponibilidad}"></option>
+                                        </select>
+                                    </form>
+                                </td>
+                                <td>
+                                    <span th:if="${t.activo}" class="badge bg-success">Activo</span>
+                                    <span th:unless="${t.activo}" class="badge bg-secondary">Inactivo</span>
+                                </td>
+                                <td class="text-end pe-4">
+                                    <a th:href="@{'/tecnicos/editar/' + ${t.id}}" class="btn btn-sm btn-outline-warning" title="Editar">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

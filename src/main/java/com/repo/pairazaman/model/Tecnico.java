@@ -16,6 +16,13 @@ public class Tecnico {
     @Column(length = 20)
     private String telefono;
 
+    @Column(length = 100)
+    private String zona;
+
+    @Enumerated(EnumType.STRING)
+    @Column(length = 20)
+    private DisponibilidadTecnico disponibilidad = DisponibilidadTecnico.DISPONIBLE;
+
     @Column(nullable = false)
     private boolean activo = true;
 
@@ -58,5 +65,22 @@ public class Tecnico {
 
     public void setActivo(boolean activo) {
         this.activo = activo;
+    }
+
+    public String getZona() {
+        return zona;
+    }
+
+    public void setZona(String zona) {
+        this.zona = zona;
+    }
+
+    /** Los técnicos creados antes de este campo no tienen valor en BD: se consideran disponibles. */
+    public DisponibilidadTecnico getDisponibilidad() {
+        return disponibilidad != null ? disponibilidad : DisponibilidadTecnico.DISPONIBLE;
+    }
+
+    public void setDisponibilidad(DisponibilidadTecnico disponibilidad) {
+        this.disponibilidad = disponibilidad;
     }
 }

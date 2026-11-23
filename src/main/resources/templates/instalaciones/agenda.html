@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title>Agenda semanal</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h2 class="fw-bold mb-1">Agenda semanal de instalaciones</h2>
+                <p class="text-muted mb-0">
+                    Semana del <strong th:text="${#temporals.format(lunes, 'dd/MM/yyyy')}">17/11/2026</strong>
+                    al <strong th:text="${#temporals.format(domingo, 'dd/MM/yyyy')}">23/11/2026</strong>
+                </p>
+            </div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/instalaciones}" class="btn btn-outline-secondary shadow-sm">
+                    <i class="bi bi-list-ul me-1"></i> Ver listado
+                </a>
+                <a th:href="@{/instalaciones/nueva}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Nueva orden
+                </a>
+            </div>
+        </div>
+
+        <!-- Navegación de semana + filtro por técnico -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form th:action="@{/instalaciones/agenda}" method="get" class="row g-3 align-items-end">
+                    <input type="hidden" name="fecha" th:value="${lunes}">
+                    <div class="col-12 col-md-4">
+                        <label for="filtroTecnico" class="form-label small fw-semibold text-muted">Técnico</label>
+                        <select name="tecnicoId" id="filtroTecnico" class="form-select" onchange="this.form.submit()">
+                            <option value="">-- Todos los técnicos --</option>
+                            <option th:each="t : ${tecnicos}" th:value="${t.id}" th:text="${t.nombreCompleto}"
+                                    th:selected="${t.id == tecnicoSeleccionado}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-8 d-flex flex-wrap justify-content-md-end gap-2">
+                        <a th:href="@{/instalaciones/agenda(fecha=${semanaAnterior}, tecnicoId=${tecnicoSeleccionado})}" class="btn btn-outline-secondary">
+                            <i class="bi bi-chevron-left"></i> Semana anterior
+                        </a>
+                        <a th:href="@{/instalaciones/agenda(tecnicoId=${tecnicoSeleccionado})}" class="btn btn-outline-primary">Hoy</a>
+                        <a th:href="@{/instalaciones/agenda(fecha=${semanaSiguiente}, tecnicoId=${tecnicoSeleccionado})}" class="btn btn-outline-secondary">
+                            Semana siguiente <i class="bi bi-chevron-right"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Cuadrícula de 7 días -->
+        <div class="row row-cols-1 row-cols-md-2 row-cols-xl-4 g-3">
+            <div class="col" th:each="dia : ${semana}">
+                <div class="card h-100 shadow-sm" th:classappend="${dia.hoy} ? 'border-primary' : 'border-0'">
+                    <div class="card-header py-2 d-flex justify-content-between align-items-center"
+                         th:classappend="${dia.hoy} ? 'bg-primary text-white' : 'bg-light'">
+                        <span class="fw-bold text-capitalize" th:text="${dia.nombreDia}">lunes</span>
+                        <small th:text="${dia.fechaCorta}">17/11</small>
+                    </div>
+                    <div class="card-body p-2">
+                        <p th:if="${#lists.isEmpty(dia.ordenes)}" class="text-muted small text-center my-3">Sin órdenes</p>
+                        <a th:each="o : ${dia.ordenes}" th:href="@{'/instalaciones/editar/' + ${o.id}}"
+                           class="d-block text-decoration-none text-dark border rounded p-2 mb-2">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <span class="fw-bold" th:text="${o.hora != null} ? ${#temporals.format(o.hora, 'HH:mm')} : 'Sin hora'">09:00</span>
+                                <span class="badge" th:classappend="'bg-' + ${o.estadoOrden.colorBadge}" th:text="${o.estadoOrden.etiqueta}">Estado</span>
+                            </div>
+                            <span th:if="${o.tipo != null}" class="badge mb-1" th:classappend="'bg-' + ${o.tipo.colorBadge}" th:text="${o.tipo.etiqueta}">Tipo</span>
+                            <div class="small fw-semibold" th:text="${o.cliente != null} ? ${o.cliente.nombresRazonSocial} : '—'">Cliente</div>
+                            <div class="small text-muted" th:text="${o.direccion}">Dirección</div>
+                            <div class="small mt-1">
+                                <i class="bi bi-person-fill"></i>
+                                <span th:if="${o.tecnico != null}" th:text="${o.tecnico.nombreCompleto}">Técnico</span>
+                                <span th:if="${o.tecnico == null}" class="text-danger">Sin asignar</span>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>

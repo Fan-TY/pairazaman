@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title th:text="${tituloVista}">Orden de servicio</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="row justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-7">
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header bg-white py-3 border-bottom d-flex justify-content-between align-items-center">
+                        <h5 class="fw-bold mb-0" th:text="${tituloVista}">Programar nueva orden</h5>
+                        <a th:href="@{/instalaciones}" class="btn btn-outline-secondary btn-sm">Regresar</a>
+                    </div>
+                    <div class="card-body p-4">
+                        <div th:if="${#lists.isEmpty(contratos)}" class="alert alert-warning">
+                            <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                            Todavía no hay contratos registrados. Registra el contrato del cliente antes de programar una orden.
+                        </div>
+
+                        <form th:action="@{/instalaciones/guardar}" th:object="${ordenDto}" method="post">
+                            <input type="hidden" th:field="*{id}">
+
+                            <div class="mb-3">
+                                <label for="contratoId" class="form-label fw-semibold">Contrato / Cliente <span class="text-danger">*</span></label>
+                                <select id="contratoId" th:field="*{contratoId}" class="form-select" required>
+                                    <option value="">-- Selecciona un contrato --</option>
+                                    <option th:each="c : ${contratos}" th:value="${c.id}"
+                                            th:text="${c.codigo} + ' — ' + ${c.cliente.nombresRazonSocial}"
+                                            th:attr="data-direccion=${c.cliente.direccion}"></option>
+                                </select>
+                            </div>
+
+                            <div class="row g-3 mb-3">
+                                <div class="col-12 col-md-4">
+                                    <label for="tipo" class="form-label fw-semibold">Tipo <span class="text-danger">*</span></label>
+                                    <select id="tipo" th:field="*{tipo}" class="form-select" required>
+                                        <option th:each="t : ${tipos}" th:value="${t}" th:text="${t.etiqueta}"></option>
+                                    </select>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <label for="fecha" class="form-label fw-semibold">Fecha <span class="text-danger">*</span></label>
+                                    <input type="date" id="fecha" th:field="*{fecha}" class="form-control" required>
+                                </div>
+                                <div class="col-6 col-md-4">
+                                    <label for="hora" class="form-label fw-semibold">Hora <span class="text-danger">*</span></label>
+                                    <input type="time" id="hora" th:field="*{hora}" class="form-control" required>
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="direccion" class="form-label fw-semibold">Dirección del servicio <span class="text-danger">*</span></label>
+                                <input type="text" id="direccion" th:field="*{direccion}" class="form-control" maxlength="200"
+                                       placeholder="Se completa con la dirección del cliente; puedes cambiarla">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="observaciones" class="form-label fw-semibold">Observaciones</label>
+                                <textarea id="observaciones" th:field="*{observaciones}" class="form-control" rows="3" maxlength="500"
+                                          placeholder="Referencias de la casa, equipos a llevar, horario preferido del cliente..."></textarea>
+                            </div>
+
+                            <div class="row g-3 mb-4">
+                                <div class="col-12" th:classappend="${editando} ? 'col-md-7' : ''">
+                                    <label for="tecnicoId" class="form-label fw-semibold">Técnico asignado</label>
+                                    <select id="tecnicoId" th:field="*{tecnicoId}" class="form-select">
+                                        <option value="">-- Sin asignar --</option>
+                                        <option th:each="t : ${tecnicos}" th:value="${t.id}"
+                                                th:disabled="${t.disponibilidad.name() == 'NO_DISPONIBLE'}"
+                                                th:text="${t.nombreCompleto} + (${t.zona} != null ? ' · ' + ${t.zona} : '') + ' (' + ${t.disponibilidad.etiqueta} + ')'"></option>
+                                    </select>
+                                    <div class="form-text">Al asignar o cambiar el técnico, recibe un aviso en su panel.</div>
+                                </div>
+                                <div class="col-12 col-md-5" th:if="${editando}">
+                                    <label for="estado" class="form-label fw-semibold">Estado</label>
+                                    <select id="estado" th:field="*{estado}" class="form-select">
+                                        <option th:each="e : ${estados}" th:value="${e}" th:text="${e.etiqueta}"></option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end gap-2 border-top pt-3">
+                                <a th:href="@{/instalaciones}" class="btn btn-outline-secondary">Cancelar</a>
+                                <button type="submit" class="btn btn-primary px-4">
+                                    <i class="bi bi-calendar-check me-1"></i> Guardar orden
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script>
+            // Al elegir contrato, propone la dirección del cliente si el campo está vacío.
+            (function () {
+                var contrato = document.getElementById('contratoId');
+                var direccion = document.getElementById('direccion');
+                if (!contrato || !direccion) return;
+                contrato.addEventListener('change', function () {
+                    var opcion = contrato.options[contrato.selectedIndex];
+                    var sugerida = opcion ? opcion.getAttribute('data-direccion') : null;
+                    if (sugerida && direccion.value.trim() === '') {
+                        direccion.value = sugerida;
+                    }
+                });
+            })();
+        </script>
+    </th:block>
+</body>
+</html>
