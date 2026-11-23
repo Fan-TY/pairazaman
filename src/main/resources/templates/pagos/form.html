@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Registrar Pago - Cobranza</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Registrar Pago o Facturación</h2>
+          <p class="text-muted mb-0">Busca al cliente, consulta su estado de deuda y registra su pago.</p>
+        </div>
+        <a th:href="@{/pagos}" class="btn btn-outline-secondary">
+          <i class="bi bi-arrow-left me-1"></i> Volver al listado
+        </a>
+      </div>
+
+      <div th:if="${error}" class="alert alert-danger border-0 shadow-sm">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}">Error</span>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-header bg-white py-3">
+          <h5 class="fw-bold mb-0"><i class="bi bi-person-search me-2 text-primary"></i>1. Buscar y seleccionar cliente</h5>
+        </div>
+        <div class="card-body">
+          <form th:action="@{/pagos/nuevo}" method="get" class="row g-2 mb-3">
+            <div class="col-12 col-md-9">
+              <input type="text" name="q" class="form-control" th:value="${q}"
+                     placeholder="Ingresa DNI, RUC o Nombre / Razón Social del cliente...">
+            </div>
+            <div class="col-12 col-md-3">
+              <button type="submit" class="btn btn-pz w-100">
+                <i class="bi bi-search me-1"></i> Buscar cliente
+              </button>
+            </div>
+          </form>
+
+          <div class="table-responsive" style="max-height: 220px;">
+            <table class="table table-sm table-hover align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>DNI / RUC</th>
+                  <th>Cliente / Razón Social</th>
+                  <th>Teléfono</th>
+                  <th class="text-end">Seleccionar</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                  <td colspan="4" class="text-center py-3 text-muted">
+                    No hay clientes activos registrados o no coinciden con la búsqueda.
+                  </td>
+                </tr>
+                <tr th:each="c : ${clientes}"
+                    th:classappend="${clienteSeleccionado != null and clienteSeleccionado.id == c.id} ? 'table-primary' : ''">
+                  <td class="fw-semibold" th:text="${c.dniRuc}">00000000</td>
+                  <td th:text="${c.nombresRazonSocial}">Nombre Cliente</td>
+                  <td th:text="${c.telefono != null ? c.telefono : '—'}">999999999</td>
+                  <td class="text-end">
+                    <a th:href="@{/pagos/nuevo(clienteId=${c.id}, q=${q})}" class="btn btn-sm btn-outline-primary">
+                      Consultar deuda
+                    </a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div th:if="${clienteSeleccionado != null}" class="row g-4">
+        <div class="col-12 col-lg-5">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white py-3">
+              <h5 class="fw-bold mb-0"><i class="bi bi-wallet2 me-2 text-success"></i>Estado de Cuenta del Cliente</h5>
+            </div>
+            <div class="card-body">
+              <p class="mb-1 text-muted small">Cliente seleccionado</p>
+              <h5 class="fw-bold mb-1" th:text="${clienteSeleccionado.nombresRazonSocial}">Nombre</h5>
+              <p class="text-muted small mb-3" th:text="'DNI/RUC: ' + ${clienteSeleccionado.dniRuc}">DNI</p>
+
+              <div class="p-3 rounded-3 mb-3"
+                   th:classappend="${deudaActual > 0} ? 'bg-danger bg-opacity-10 border border-danger' : 'bg-success bg-opacity-10 border border-success'">
+                <small class="text-uppercase fw-semibold d-block"
+                       th:classappend="${deudaActual > 0} ? 'text-danger' : 'text-success'">
+                  Deuda Total Pendiente
+                </small>
+                <h2 class="fw-bold mb-0"
+                    th:classappend="${deudaActual > 0} ? 'text-danger' : 'text-success'">
+                  S/ <span th:text="${#numbers.formatDecimal(deudaActual, 1, 2)}">0.00</span>
+                </h2>
+                <small class="text-muted" th:text="${deudaActual > 0} ? 'El cliente tiene cuentas por regularizar.' : 'Cliente al día en sus pagos.'"></small>
+              </div>
+
+              <div th:if="${!#lists.isEmpty(cuotasPendientes)}">
+                <h6 class="fw-bold small text-uppercase text-muted mb-2">Cuotas Pendientes / Vencidas</h6>
+                <ul class="list-group list-group-flush small">
+                  <li th:each="cp : ${cuotasPendientes}" class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                    <div>
+                      <span class="fw-semibold" th:text="${cp.concepto != null ? cp.concepto : 'MENSUALIDAD'}">MENSUALIDAD</span>
+                      <span class="badge ms-1"
+                            th:classappend="${#strings.equalsIgnoreCase(cp.estado, 'VENCIDO')} ? 'bg-danger' : 'bg-warning text-dark'"
+                            th:text="${cp.estado}">PENDIENTE</span>
+                      <small class="text-muted d-block" th:if="${cp.fechaVencimiento != null}"
+                             th:text="'Vence: ' + ${#temporals.format(cp.fechaVencimiento, 'dd/MM/yyyy')}"></small>
+                    </div>
+                    <strong th:text="'S/ ' + ${#numbers.formatDecimal(cp.monto, 1, 2)}">S/ 0.00</strong>
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-7">
+          <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white py-3">
+              <h5 class="fw-bold mb-0"><i class="bi bi-receipt-cutoff me-2 text-primary"></i>2. Datos del Pago / Comprobante</h5>
+            </div>
+            <div class="card-body">
+              <form th:action="@{/pagos/guardar}" method="post" class="row g-3">
+                <input type="hidden" name="clienteId" th:value="${clienteSeleccionado.id}">
+
+                <div class="col-12" th:if="${!#lists.isEmpty(cuotasPendientes)}">
+                  <label class="form-label fw-semibold">¿Aplicar pago a una deuda existente? (Opcional)</label>
+                  <select name="cuotaPendienteId" id="cuotaPendienteId" class="form-select" onchange="actualizarMontoDesdeCuota(this)">
+                    <option value="">-- Nuevo pago / Facturación directa --</option>
+                    <option th:each="cp : ${cuotasPendientes}"
+                            th:value="${cp.id}"
+                            th:attr="data-monto=${cp.monto}, data-concepto=${cp.concepto}"
+                            th:text="${(cp.concepto != null ? cp.concepto : 'MENSUALIDAD') + ' - ' + cp.estado + ' (S/ ' + #numbers.formatDecimal(cp.monto, 1, 2) + ')'}">
+                    </option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-semibold">Concepto *</label>
+                  <select name="concepto" id="concepto" class="form-select" required>
+                    <option value="MENSUALIDAD">Mensualidad de Servicio</option>
+                    <option value="INSTALACION">Costo de Instalación</option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-semibold">Monto (S/) *</label>
+                  <input type="number" name="monto" id="monto" class="form-control" step="0.01" min="0.10"
+                         placeholder="Ej. 70.00" required>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label fw-semibold">Estado del registro *</label>
+                  <select name="estado" id="estado" class="form-select" onchange="toggleCamposEstado(this.value)" required>
+                    <option value="PAGADO" selected>Pagado (Emitir comprobante ahora)</option>
+                    <option value="PENDIENTE">Pendiente (Cuenta por cobrar)</option>
+                    <option value="VENCIDO">Vencido (Registrar deuda vencida)</option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6" id="grupoMedioPago">
+                  <label class="form-label fw-semibold">Medio de pago *</label>
+                  <select name="medioPago" class="form-select">
+                    <option value="EFECTIVO">Efectivo</option>
+                    <option value="YAPE_PLIN">Yape / Plin</option>
+                    <option value="TRANSFERENCIA">Transferencia Bancaria</option>
+                    <option value="TARJETA">Tarjeta de Débito / Crédito</option>
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6" id="grupoFechaPago">
+                  <label class="form-label fw-semibold">Fecha de pago *</label>
+                  <input type="date" name="fechaPago" class="form-control" th:value="${fechaHoy}">
+                </div>
+
+                <div class="col-12 col-md-6 d-none" id="grupoFechaVencimiento">
+                  <label class="form-label fw-semibold">Fecha de vencimiento</label>
+                  <input type="date" name="fechaVencimiento" class="form-control" th:value="${fechaHoy}">
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Observación (Opcional)</label>
+                  <input type="text" name="observacion" class="form-control" maxlength="250"
+                         placeholder="Ej. Pago correspondiente al mes actual / N° operación...">
+                </div>
+
+                <div class="col-12 pt-2 d-flex justify-content-end gap-2">
+                  <a th:href="@{/pagos}" class="btn btn-light">Cancelar</a>
+                  <button type="submit" class="btn btn-pz px-4">
+                    <i class="bi bi-check-lg me-1"></i> Guardar y actualizar saldo
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <script>
+        function actualizarMontoDesdeCuota(select) {
+          const opt = select.options[select.selectedIndex];
+          const monto = opt.getAttribute('data-monto');
+          const concepto = opt.getAttribute('data-concepto');
+          if (monto) {
+            document.getElementById('monto').value = monto;
+          }
+          if (concepto) {
+            document.getElementById('concepto').value = concepto;
+          }
+        }
+
+        function toggleCamposEstado(estado) {
+          const esPagado = estado === 'PAGADO';
+          document.getElementById('grupoMedioPago').classList.toggle('d-none', !esPagado);
+          document.getElementById('grupoFechaPago').classList.toggle('d-none', !esPagado);
+          document.getElementById('grupoFechaVencimiento').classList.toggle('d-none', esPagado);
+        }
+      </script>
+    </th:block>
+  </body>
+</html>

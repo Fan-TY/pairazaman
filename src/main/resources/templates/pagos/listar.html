@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Facturación y Control de Pagos</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h2 class="fw-bold mb-1">Facturación y Control de Pagos</h2>
+          <p class="text-muted mb-0">Registro de pagos de mensualidades e instalación, estado de cuentas y comprobantes.</p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+          <a th:href="@{/pagos/morosos}" class="btn btn-outline-danger">
+            <i class="bi bi-exclamation-octagon-fill me-1"></i> Lista de morosos
+            <span class="badge bg-danger ms-1" th:text="${cantidadMorosos}">0</span>
+          </a>
+          <a th:href="@{/pagos/nuevo}" class="btn btn-pz px-4">
+            <i class="bi bi-cash-coin me-1"></i> Registrar pago
+          </a>
+        </div>
+      </div>
+
+      <div th:if="${exito}" class="alert alert-success alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${exito}">Operación exitosa</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+      <div th:if="${error}" class="alert alert-danger alert-dismissible fade show border-0 shadow-sm" role="alert">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i><span th:text="${error}">Error</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+      </div>
+
+      <div class="row g-3 mb-4">
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted text-uppercase fw-semibold">Total Recaudado (Listado)</small>
+              <h3 class="fw-bold text-success mb-0 mt-1">
+                S/ <span th:text="${#numbers.formatDecimal(totalRecaudado, 1, 2)}">0.00</span>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body">
+              <small class="text-muted text-uppercase fw-semibold">Saldo Pendiente / Vencido</small>
+              <h3 class="fw-bold text-warning mb-0 mt-1">
+                S/ <span th:text="${#numbers.formatDecimal(totalPorCobrar, 1, 2)}">0.00</span>
+              </h3>
+            </div>
+          </div>
+        </div>
+        <div class="col-12 col-md-4">
+          <div class="card border-0 shadow-sm h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+              <div>
+                <small class="text-muted text-uppercase fw-semibold">Cuentas Vencidas (Morosos)</small>
+                <h3 class="fw-bold text-danger mb-0 mt-1" th:text="${cantidadMorosos}">0</h3>
+              </div>
+              <a th:href="@{/pagos/morosos}" class="btn btn-sm btn-outline-danger">Ver detalle</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+          <form th:action="@{/pagos}" method="get" class="row g-2 align-items-end">
+            <div class="col-12 col-md-5">
+              <label class="form-label small fw-semibold text-muted">Buscar cliente o comprobante</label>
+              <input type="text" name="filtro" class="form-control" th:value="${filtro}"
+                     placeholder="Nombre, DNI/RUC o N° comprobante...">
+            </div>
+            <div class="col-12 col-md-4">
+              <label class="form-label small fw-semibold text-muted">Filtrar por estado</label>
+              <select name="estado" class="form-select">
+                <option value="" th:selected="${estadoSeleccionado == ''}">Todos los estados</option>
+                <option value="PAGADO" th:selected="${estadoSeleccionado == 'PAGADO'}">Pagado</option>
+                <option value="PENDIENTE" th:selected="${estadoSeleccionado == 'PENDIENTE'}">Pendiente</option>
+                <option value="VENCIDO" th:selected="${estadoSeleccionado == 'VENCIDO'}">Vencido</option>
+              </select>
+            </div>
+            <div class="col-12 col-md-3 d-flex gap-2">
+              <button type="submit" class="btn btn-pz flex-grow-1">
+                <i class="bi bi-search me-1"></i> Filtrar
+              </button>
+              <a th:href="@{/pagos}" class="btn btn-light" title="Limpiar filtros">
+                <i class="bi bi-arrow-counterclockwise"></i>
+              </a>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Comprobante</th>
+                <th scope="col">Cliente</th>
+                <th scope="col">Concepto</th>
+                <th scope="col">Medio Pago</th>
+                <th scope="col">Fecha</th>
+                <th scope="col">Monto</th>
+                <th scope="col">Estado</th>
+                <th scope="col" class="text-end pe-4">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(pagos)}">
+                <td colspan="8" class="text-center py-4 text-muted">
+                  No se encontraron registros de pagos con los criterios seleccionados.
+                </td>
+              </tr>
+              <tr th:each="p : ${pagos}">
+                <td class="ps-4 fw-semibold">
+                  <span th:if="${p.numeroComprobante != null}" th:text="${p.numeroComprobante}">B001-00001</span>
+                  <span th:unless="${p.numeroComprobante != null}" class="text-muted small">Sin emitir</span>
+                </td>
+                <td>
+                  <strong th:text="${p.cliente.nombresRazonSocial}">Cliente</strong>
+                  <small class="text-muted d-block" th:text="'DNI/RUC: ' + ${p.cliente.dniRuc}">DNI</small>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark border"
+                        th:text="${p.concepto != null ? p.concepto : 'MENSUALIDAD'}">MENSUALIDAD</span>
+                </td>
+                <td th:text="${p.medioPago != null ? p.medioPago : '—'}">EFECTIVO</td>
+                <td>
+                  <span th:if="${p.fechaPago != null}" th:text="${#temporals.format(p.fechaPago, 'dd/MM/yyyy')}">01/01/2026</span>
+                  <small th:if="${p.fechaPago == null and p.fechaVencimiento != null}" class="text-danger d-block"
+                         th:text="'Vence: ' + ${#temporals.format(p.fechaVencimiento, 'dd/MM/yyyy')}">Vence</small>
+                </td>
+                <td class="fw-bold">S/ <span th:text="${#numbers.formatDecimal(p.monto, 1, 2)}">0.00</span></td>
+                <td>
+                  <span th:if="${#strings.equalsIgnoreCase(p.estado, 'PAGADO')}" class="badge bg-success">PAGADO</span>
+                  <span th:if="${#strings.equalsIgnoreCase(p.estado, 'PENDIENTE')}" class="badge bg-warning text-dark">PENDIENTE</span>
+                  <span th:if="${#strings.equalsIgnoreCase(p.estado, 'VENCIDO')}" class="badge bg-danger">VENCIDO</span>
+                </td>
+                <td class="text-end pe-4">
+                  <div class="d-inline-flex gap-1">
+                    <a th:if="${#strings.equalsIgnoreCase(p.estado, 'PAGADO')}"
+                       th:href="@{'/pagos/comprobante/' + ${p.id}}"
+                       class="btn btn-sm btn-outline-primary" title="Ver e imprimir comprobante">
+                      <i class="bi bi-receipt me-1"></i> Comprobante
+                    </a>
+                    <button th:unless="${#strings.equalsIgnoreCase(p.estado, 'PAGADO')}"
+                            type="button" class="btn btn-sm btn-success"
+                            data-bs-toggle="modal" th:attr="data-bs-target='#cobrarModal' + ${p.id}">
+                      <i class="bi bi-check2-circle me-1"></i> Cobrar
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div th:each="p : ${pagos}" th:if="${!#strings.equalsIgnoreCase(p.estado, 'PAGADO')}"
+           class="modal fade" th:id="'cobrarModal' + ${p.id}" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+          <form th:action="@{'/pagos/' + ${p.id} + '/cobrar'}" method="post" class="modal-content border-0 shadow">
+            <div class="modal-header">
+              <h5 class="modal-title fw-bold">Confirmar cobro de cuenta</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+            </div>
+            <div class="modal-body">
+              <p class="mb-2">Cliente: <strong th:text="${p.cliente.nombresRazonSocial}">Cliente</strong></p>
+              <p class="mb-3">Monto a cobrar: <strong class="text-success">S/ <span th:text="${#numbers.formatDecimal(p.monto, 1, 2)}">0.00</span></strong></p>
+              <label class="form-label fw-semibold">Medio de pago</label>
+              <select name="medioPago" class="form-select" required>
+                <option value="EFECTIVO">Efectivo</option>
+                <option value="YAPE_PLIN">Yape / Plin</option>
+                <option value="TRANSFERENCIA">Transferencia Bancaria</option>
+                <option value="TARJETA">Tarjeta</option>
+              </select>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cancelar</button>
+              <button type="submit" class="btn btn-success px-4">Registrar pago y emitir comprobante</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </th:block>
+  </body>
+</html>

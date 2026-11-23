@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Lista de Morosos - Cobranza</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <div>
+          <h2 class="fw-bold text-danger mb-1">
+            <i class="bi bi-exclamation-octagon-fill me-2"></i>Seguimiento de Morosos
+          </h2>
+          <p class="text-muted mb-0">Clientes con cuotas vencidas pendientes de regularización.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a th:href="@{/pagos}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver a pagos
+          </a>
+          <a th:href="@{/pagos/nuevo}" class="btn btn-pz px-4">
+            <i class="bi bi-plus-lg me-1"></i> Nuevo registro
+          </a>
+        </div>
+      </div>
+
+      <div class="card border-0 shadow-sm mb-4 border-start border-danger border-4">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <small class="text-muted text-uppercase fw-semibold">Deuda Vencida Total Acumulada</small>
+            <h3 class="fw-bold text-danger mb-0 mt-1">
+              S/ <span th:text="${#numbers.formatDecimal(totalVencido, 1, 2)}">0.00</span>
+            </h3>
+          </div>
+          <span class="badge bg-danger fs-6" th:text="${#lists.size(morosos)} + ' cuenta(s) vencida(s)'">0 cuentas</span>
+        </div>
+      </div>
+      <div class="card border-0 shadow-sm">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="table-light">
+              <tr>
+                <th scope="col" class="ps-4">Cliente</th>
+                <th scope="col">Contacto</th>
+                <th scope="col">Concepto</th>
+                <th scope="col">Fecha Vencimiento</th>
+                <th scope="col">Monto Vencido</th>
+                <th scope="col" class="text-end pe-4">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:if="${#lists.isEmpty(morosos)}">
+                <td colspan="6" class="text-center py-4 text-muted">
+                  ¡Excelente! No hay clientes con cuentas vencidas registradas actualmente.
+                </td>
+              </tr>
+              <tr th:each="m : ${morosos}">
+                <td class="ps-4">
+                  <strong th:text="${m.cliente.nombresRazonSocial}">Cliente</strong>
+                  <small class="text-muted d-block" th:text="'DNI/RUC: ' + ${m.cliente.dniRuc}">DNI</small>
+                </td>
+                <td>
+                  <span th:text="${m.cliente.telefono != null ? m.cliente.telefono : 'Sin teléfono'}">999999999</span>
+                  <small class="text-muted d-block" th:text="${m.cliente.correo != null ? m.cliente.correo : ''}">correo</small>
+                </td>
+                <td>
+                  <span class="badge bg-light text-dark border"
+                        th:text="${m.concepto != null ? m.concepto : 'MENSUALIDAD'}">MENSUALIDAD</span>
+                </td>
+                <td class="text-danger fw-semibold">
+                  <span th:if="${m.fechaVencimiento != null}"
+                        th:text="${#temporals.format(m.fechaVencimiento, 'dd/MM/yyyy')}">01/01/2026</span>
+                  <span th:unless="${m.fechaVencimiento != null}">Vencido</span>
+                </td>
+                <td class="fw-bold text-danger">
+                  S/ <span th:text="${#numbers.formatDecimal(m.monto, 1, 2)}">0.00</span>
+                </td>
+                <td class="text-end pe-4">
+                  <form th:action="@{'/pagos/' + ${m.id} + '/cobrar'}" method="post" class="d-inline-flex gap-1">
+                    <select name="medioPago" class="form-select form-select-sm" style="width: 135px;">
+                      <option value="EFECTIVO">Efectivo</option>
+                      <option value="YAPE_PLIN">Yape / Plin</option>
+                      <option value="TRANSFERENCIA">Transferencia</option>
+                      <option value="TARJETA">Tarjeta</option>
+                    </select>
+                    <button type="submit" class="btn btn-sm btn-success">
+                      <i class="bi bi-check2-circle me-1"></i> Cobrar
+                    </button>
+                  </form>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </th:block>
+  </body>
+</html>
