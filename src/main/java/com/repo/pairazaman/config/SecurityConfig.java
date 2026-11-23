@@ -2,6 +2,7 @@ package com.repo.pairazaman.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -34,7 +35,12 @@ public class SecurityConfig {
                         .requestMatchers("/camaras/**").hasRole("GERENTE")
                         .requestMatchers("/contratos/**").hasAnyRole("GERENTE", "SECRETARIA")
                         .requestMatchers("/clientes/**").hasAnyRole("GERENTE", "SECRETARIA", "COBRANZA")
-                        .requestMatchers("/instalaciones/**", "/reclamos/**").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
+                        // Programación de órdenes (RF-03): la gestiona Secretaria/Gerente. El técnico solo
+                        // puede ver el listado de sus órdenes (GET /instalaciones) y el panel móvil.
+                        .requestMatchers(HttpMethod.GET, "/instalaciones").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
+                        .requestMatchers("/instalaciones/mis-ordenes/**").hasAnyRole("GERENTE", "TECNICO")
+                        .requestMatchers("/instalaciones/**", "/tecnicos/**").hasAnyRole("GERENTE", "SECRETARIA")
+                        .requestMatchers("/reclamos/**").hasAnyRole("GERENTE", "SECRETARIA", "TECNICO")
                         .requestMatchers("/incidencias/eliminar/**").hasRole("GERENTE")
                         .requestMatchers("/incidencias/**").hasAnyRole("GERENTE", "TECNICO")
                         .requestMatchers("/pagos/**").hasAnyRole("GERENTE", "COBRANZA")

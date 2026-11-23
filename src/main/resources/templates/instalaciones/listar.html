@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+<head>
+    <title>Instalaciones</title>
+</head>
+<body>
+    <th:block th:fragment="content">
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-2">
+            <div>
+                <h2 class="fw-bold mb-1" th:text="${soloLectura} ? 'Mis órdenes asignadas' : 'Instalaciones y órdenes de servicio'">Instalaciones</h2>
+                <p class="text-muted mb-0" th:text="${soloLectura} ? 'Órdenes que tienes asignadas.' : 'Programa instalaciones, reparaciones y mantenimientos, y asigna al técnico responsable.'">Descripción</p>
+            </div>
+            <div class="d-flex gap-2" th:unless="${soloLectura}">
+                <a th:href="@{/instalaciones/agenda}" class="btn btn-outline-secondary shadow-sm">
+                    <i class="bi bi-calendar-week me-1"></i> Agenda semanal
+                </a>
+                <a th:href="@{/tecnicos}" class="btn btn-outline-secondary shadow-sm">
+                    <i class="bi bi-person-gear me-1"></i> Personal técnico
+                </a>
+                <a th:href="@{/instalaciones/nueva}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Nueva orden
+                </a>
+            </div>
+        </div>
+
+        <!-- Filtros -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body">
+                <form th:action="@{/instalaciones}" method="get" class="row g-3 align-items-end">
+                    <div class="col-12" th:classappend="${soloLectura} ? 'col-md-8' : 'col-md-4'">
+                        <label for="filtroEstado" class="form-label small fw-semibold text-muted">Filtrar por estado</label>
+                        <select name="estado" id="filtroEstado" class="form-select">
+                            <option value="">-- Todos los estados --</option>
+                            <option th:each="est : ${estados}" th:value="${est}" th:text="${est.etiqueta}"
+                                    th:selected="${est == estadoSeleccionado}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4" th:unless="${soloLectura}">
+                        <label for="filtroTecnico" class="form-label small fw-semibold text-muted">Filtrar por técnico</label>
+                        <select name="tecnicoId" id="filtroTecnico" class="form-select">
+                            <option value="">-- Todos los técnicos --</option>
+                            <option th:each="t : ${tecnicos}" th:value="${t.id}" th:text="${t.nombreCompleto}"
+                                    th:selected="${t.id == tecnicoSeleccionado}"></option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-4 d-flex gap-2">
+                        <button type="submit" class="btn btn-secondary flex-grow-1">
+                            <i class="bi bi-funnel-fill me-1"></i> Aplicar filtros
+                        </button>
+                        <a th:href="@{/instalaciones}" class="btn btn-outline-secondary" title="Limpiar filtros">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tabla -->
+        <div class="card border-0 shadow-sm">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col" class="ps-4">Orden</th>
+                                <th scope="col">Fecha / Hora</th>
+                                <th scope="col">Tipo</th>
+                                <th scope="col">Cliente / Contrato</th>
+                                <th scope="col">Dirección</th>
+                                <th scope="col">Técnico</th>
+                                <th scope="col">Estado</th>
+                                <th scope="col" class="text-end pe-4" th:unless="${soloLectura}">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr th:if="${#lists.isEmpty(ordenes)}">
+                                <td colspan="8" class="text-center py-5 text-muted">
+                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                    No hay órdenes con los criterios seleccionados.
+                                </td>
+                            </tr>
+                            <tr th:each="o : ${ordenes}">
+                                <td class="ps-4 fw-semibold text-muted" th:text="'#' + ${o.id}">#1</td>
+                                <td>
+                                    <span th:text="${o.fechaInstalacion != null} ? ${#temporals.format(o.fechaInstalacion, 'dd/MM/yyyy')} : '—'">22/11/2026</span>
+                                    <small class="text-muted d-block" th:text="${o.hora != null} ? ${#temporals.format(o.hora, 'HH:mm')} : 'Sin hora'">09:00</small>
+                                </td>
+                                <td>
+                                    <span th:if="${o.tipo != null}" class="badge" th:classappend="'bg-' + ${o.tipo.colorBadge}" th:text="${o.tipo.etiqueta}">Tipo</span>
+                                    <span th:if="${o.tipo == null}" class="text-muted small">—</span>
+                                </td>
+                                <td>
+                                    <span class="fw-semibold" th:text="${o.cliente != null} ? ${o.cliente.nombresRazonSocial} : '—'">Cliente</span>
+                                    <small class="text-muted d-block" th:if="${o.contrato != null}" th:text="'Contrato ' + ${o.contrato.codigo}">CT-001</small>
+                                </td>
+                                <td th:text="${o.direccion}">Dirección</td>
+                                <td>
+                                    <span th:if="${o.tecnico != null}" th:text="${o.tecnico.nombreCompleto}">Técnico</span>
+                                    <span th:if="${o.tecnico == null}" class="badge bg-danger-subtle text-danger border border-danger">Sin asignar</span>
+                                </td>
+                                <td>
+                                    <span class="badge" th:classappend="'bg-' + ${o.estadoOrden.colorBadge}" th:text="${o.estadoOrden.etiqueta}">Estado</span>
+                                </td>
+                                <td class="text-end pe-4" th:unless="${soloLectura}">
+                                    <div class="d-flex justify-content-end align-items-center gap-2">
+                                        <form th:action="@{'/instalaciones/' + ${o.id} + '/estado'}" method="post" class="m-0">
+                                            <select name="estado" class="form-select form-select-sm" title="Cambiar estado" onchange="this.form.submit()">
+                                                <option th:each="est : ${estados}" th:value="${est}" th:text="${est.etiqueta}"
+                                                        th:selected="${est == o.estadoOrden}"></option>
+                                            </select>
+                                        </form>
+                                        <a th:href="@{'/instalaciones/editar/' + ${o.id}}" class="btn btn-sm btn-outline-warning" title="Editar / reasignar">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </th:block>
+</body>
+</html>
