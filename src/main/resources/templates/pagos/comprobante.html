@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://thymeleaf.org" th:replace="~{layout/base :: layout(~{::content})}">
+  <head>
+    <title>Comprobante de Pago</title>
+  </head>
+  <body>
+    <th:block th:fragment="content">
+      <style>
+        @media print {
+          nav, footer, .no-print {
+            display: none !important;
+          }
+          body {
+            background: #fff !important;
+          }
+          .card {
+            box-shadow: none !important;
+            border: 1px solid #dee2e6 !important;
+          }
+        }
+      </style>
+
+      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4 no-print">
+        <div>
+          <h2 class="fw-bold mb-1">Comprobante de Pago Digital</h2>
+          <p class="text-muted mb-0">Vista previa lista para impresión o guardado en PDF.</p>
+        </div>
+        <div class="d-flex gap-2">
+          <a th:href="@{/pagos}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Volver a pagos
+          </a>
+          <button type="button" onclick="window.print()" class="btn btn-pz px-4">
+            <i class="bi bi-printer-fill me-1"></i> Imprimir / Guardar PDF
+          </button>
+        </div>
+      </div>
+
+      <div th:if="${exito}" class="alert alert-success border-0 shadow-sm no-print">
+        <i class="bi bi-check-circle-fill me-2"></i><span th:text="${exito}">Comprobante emitido</span>
+      </div>
+
+      <div class="card border-0 shadow-sm mx-auto" style="max-width: 720px;">
+        <div class="card-body p-4 p-md-5">
+          <div class="d-flex flex-wrap justify-content-between align-items-start border-bottom pb-4 mb-4">
+            <div>
+              <h4 class="fw-bold text-primary mb-1">TELECOMUNICACIONES PAIRAZAMAN S.A.C.</h4>
+              <p class="text-muted small mb-0">Servicio de Internet Fibra Óptica y Televisión por Cable</p>
+              <p class="text-muted small mb-0">Comprobante Electrónico Interno</p>
+            </div>
+            <div class="text-md-end mt-3 mt-md-0">
+              <div class="border border-primary rounded-3 px-3 py-2 bg-light">
+                <small class="text-uppercase text-muted d-block fw-semibold">Comprobante N°</small>
+                <strong class="fs-5 text-primary"
+                        th:text="${pago.numeroComprobante != null ? pago.numeroComprobante : 'B001-' + pago.id}">
+                  B001-00001
+                </strong>
+              </div>
+            </div>
+          </div>
+          <div class="row g-3 mb-4">
+            <div class="col-12 col-md-6">
+              <small class="text-muted text-uppercase fw-semibold d-block">Datos del Cliente</small>
+              <p class="fw-bold mb-1" th:text="${cliente.nombresRazonSocial}">Nombre del Cliente</p>
+              <p class="small mb-1" th:text="'DNI / RUC: ' + ${cliente.dniRuc}">DNI</p>
+              <p class="small text-muted mb-0" th:if="${cliente.direccion != null}" th:text="'Dirección: ' + ${cliente.direccion}">Dirección</p>
+            </div>
+            <div class="col-12 col-md-6 text-md-end">
+              <small class="text-muted text-uppercase fw-semibold d-block">Detalles de Emisión</small>
+              <p class="small mb-1">
+                <strong>Fecha de Pago:</strong>
+                <span th:text="${pago.fechaPago != null ? #temporals.format(pago.fechaPago, 'dd/MM/yyyy') : '—'}">01/01/2026</span>
+              </p>
+              <p class="small mb-1">
+                <strong>Medio de Pago:</strong>
+                <span th:text="${pago.medioPago != null ? pago.medioPago : 'EFECTIVO'}">EFECTIVO</span>
+              </p>
+              <p class="small mb-0">
+                <strong>Estado:</strong>
+                <span class="badge bg-success" th:text="${pago.estado}">PAGADO</span>
+              </p>
+            </div>
+          </div>
+
+          <div class="table-responsive mb-4">
+            <table class="table table-bordered align-middle mb-0">
+              <thead class="table-light">
+                <tr>
+                  <th>Descripción / Concepto</th>
+                  <th class="text-end" style="width: 160px;">Importe</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <strong th:text="${pago.concepto != null ? pago.concepto : 'MENSUALIDAD'}">MENSUALIDAD</strong>
+                    <small class="text-muted d-block" th:if="${pago.observacion != null and !pago.observacion.isEmpty()}"
+                           th:text="${pago.observacion}">Observación</small>
+                  </td>
+                  <td class="text-end fw-bold">
+                    S/ <span th:text="${#numbers.formatDecimal(pago.monto, 1, 2)}">0.00</span>
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="table-light">
+                  <th class="text-end">TOTAL PAGADO</th>
+                  <th class="text-end fs-5 text-success">
+                    S/ <span th:text="${#numbers.formatDecimal(pago.monto, 1, 2)}">0.00</span>
+                  </th>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <div class="d-flex justify-content-between align-items-center p-3 rounded-3 bg-light border">
+            <span class="small fw-semibold text-muted">Saldo pendiente actual del cliente tras este pago:</span>
+            <strong th:classappend="${deudaRestante > 0} ? 'text-danger' : 'text-success'">
+              S/ <span th:text="${#numbers.formatDecimal(deudaRestante, 1, 2)}">0.00</span>
+            </strong>
+          </div>
+
+          <div class="text-center text-muted small mt-4 pt-3 border-top">
+            Gracias por su puntualidad. Este documento constituye un comprobante válido de pago registrado en sistema.
+          </div>
+        </div>
+      </div>
+    </th:block>
+  </body>
+</html>
