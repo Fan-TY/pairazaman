@@ -1,5 +1,7 @@
+
 package com.repo.pairazaman.model;
 
+import com.repo.pairazaman.historial.Instalacion;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +27,7 @@ public class Incidencia {
     private LocalDate fecha;
 
     @Column(length = 10)
-    private String hora; // Formato HH:mm
+    private String hora;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 30)
@@ -49,6 +51,11 @@ public class Incidencia {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "operador_id")
     private Usuario operador;
+
+    // Orden de instalación relacionada con la incidencia.
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "instalacion_id")
+    private Instalacion instalacion;
 
     @Column(nullable = false)
     private LocalDateTime fechaRegistro;
@@ -79,7 +86,6 @@ public class Incidencia {
         this.fechaActualizacion = LocalDateTime.now();
     }
 
-    // Getters y Setters
     public Long getId() {
         return id;
     }
@@ -166,6 +172,14 @@ public class Incidencia {
 
     public void setOperador(Usuario operador) {
         this.operador = operador;
+    }
+
+    public Instalacion getInstalacion() {
+        return instalacion;
+    }
+
+    public void setInstalacion(Instalacion instalacion) {
+        this.instalacion = instalacion;
     }
 
     public LocalDateTime getFechaRegistro() {

@@ -1,3 +1,4 @@
+
 package com.repo.pairazaman.dto;
 
 import com.repo.pairazaman.model.EstadoIncidencia;
@@ -21,6 +22,7 @@ public class IncidenciaDto {
     private EstadoIncidencia estado;
     private String ubicacion;
     private Long camaraId;
+    private Long ordenId; // Nueva relación con la orden de instalación
 
     public IncidenciaDto() {
         this.fecha = LocalDate.now();
@@ -107,5 +109,14 @@ public class IncidenciaDto {
 
     public void setCamaraId(Long camaraId) {
         this.camaraId = camaraId;
+    }
+
+    // Getters y setters de la orden vinculada
+    public Long getOrdenId() {
+        return ordenId;
+    }
+
+    public void setOrdenId(Long ordenId) {
+        this.ordenId = ordenId;
     }
 }
